@@ -1,5 +1,8 @@
 # Berry2D
+
 A berry good 2D game framework (C + SDL) which I will definitely make games with.
+
+320 × 200 (4:3)
 
 render SDL_Textures with SDL_Renderer
 
