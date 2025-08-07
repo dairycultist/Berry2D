@@ -7,8 +7,12 @@
 #define WIDTH 320
 #define HEIGHT 200
 
+#define TRUE 1
+#define FALSE 0
 
 
+
+// eventually this will be its own file (implementing <Berry2D.h>) and needn't even reference SDL2 anywhere
 static SDL_Texture *texture;
 static SDL_Rect texture_rect = {0, 0, 16, 16};
 
@@ -54,7 +58,7 @@ int main() {
 	// process events until window is closed
 	SDL_Event event;
 	SDL_Rect letterbox = {0, 0, WIDTH, HEIGHT}; // TODO dynamically change based on screen resize
-	char running = 1;
+	char running = TRUE;
 
 	while (running) {
 
@@ -62,7 +66,11 @@ int main() {
 
 			if (event.type == SDL_QUIT) {
 
-				running = 0;
+				running = FALSE;
+
+			} else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) {
+
+				printf("Resized to %d x %d\n", event.window.data1, event.window.data2);
 			}
 		}
 
