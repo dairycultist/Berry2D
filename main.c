@@ -10,23 +10,27 @@ int main() {
 	printf("Starting Berry2D\n");
 
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-		printf("Could not initialize SDL\n");
+		printf("Error initializing SDL:\n%s\n", SDL_GetError());
 		return 1;
 	}
 
-	// create the window
 	SDL_Window *window = SDL_CreateWindow("Berry2D", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 320, 200, SDL_WINDOW_RESIZABLE);
 
 	if (!window) {
-        printf("Could not create window");
+		printf("Error creating window:\n%s\n", SDL_GetError());
 		return 1;
     }
 
 	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
 
+	if (!renderer) {
+		printf("Error creating renderer:\n%s\n", SDL_GetError());
+		return 1;
+	}
+
 	// process events until window is closed
 	SDL_Event event;
-	int running = 1;
+	char running = 1;
 
 	while (running) {
 
