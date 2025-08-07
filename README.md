@@ -4,7 +4,7 @@ A berry good 2D game framework (C + SDL) which I will definitely make games with
 
 320 × 200 (4:3), 30fps, \<input\>
 
-the cool part is that the game logic and underlying graphics/input calls are completely separate, meaning you could rewrite the latter (i.e. for a different platform) while maintaining compatibility with the former
+the cool part is that the game logic and underlying graphics/input calls (handled by SDL) are completely separate, meaning you could rewrite the latter (i.e. for a different platform) while maintaining compatibility with the former
 
 ## Using Berry2D
 
@@ -23,4 +23,6 @@ Clone the repository, build a `.o` file from the framework, implement a script i
 
 ```
 gcc -o build main.c -lSDL2_image $(sdl2-config --libs) $(sdl2-config --cflags)
+
+gcc -o build main.c testgame.c -lSDL2_image $(sdl2-config --libs) $(sdl2-config --cflags)
 ```

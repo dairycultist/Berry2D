@@ -1,8 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-
-// draw_sprite(x, y, texture_data, sprite_w, sprite_h)
-// draw_text(string, x, y, texture_data, glyph_w, glyph_h)
+#include "Berry2D.h"
 
 #define WIDTH 320
 #define HEIGHT 200
@@ -10,23 +8,27 @@
 #define TRUE 1
 #define FALSE 0
 
+static SDL_Window *window;
+static SDL_Renderer *renderer;
+static SDL_Texture *screen_buffer;
 
+Sprite *load_sprite(const char *path) {
 
-// eventually this will be its own file (implementing <Berry2D.h>) and needn't even reference SDL2 anywhere
-static SDL_Texture *texture;
-static SDL_Rect texture_rect = {0, 0, 16, 16};
+	Sprite *sprite = malloc(sizeof(Sprite));
 
-void init(SDL_Renderer *renderer) {
+	sprite->sdl_texture = IMG_LoadTexture(renderer, path);
 
-	texture = IMG_LoadTexture(renderer, "test.png");
+	SDL_QueryTexture(sprite->sdl_texture, NULL, NULL, &sprite->w, &sprite->h);
+
+	return sprite;
 }
 
-void process(SDL_Renderer *renderer) { // will also contain booleans for input
+void draw_sprite(Sprite *sprite, int x, int y) {
 
-	SDL_RenderCopy(renderer, texture, NULL, &texture_rect);
+	SDL_Rect texture_rect = { x, y, sprite->w, sprite->h };
+
+	SDL_RenderCopy(renderer, sprite->sdl_texture, NULL, &texture_rect);
 }
-
-
 
 int main() {
 
@@ -37,23 +39,23 @@ int main() {
 		return 1;
 	}
 
-	SDL_Window *window = SDL_CreateWindow("Berry2D", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_RESIZABLE);
+	window = SDL_CreateWindow("Berry2D", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_RESIZABLE);
 
 	if (!window) {
 		printf("Error creating window:\n%s\n", SDL_GetError());
 		return 1;
     }
 
-	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
+	renderer = SDL_CreateRenderer(window, -1, 0);
 
 	if (!renderer) {
 		printf("Error creating renderer:\n%s\n", SDL_GetError());
 		return 1;
 	}
 
-	SDL_Texture *screen_buffer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, WIDTH, HEIGHT);
+	screen_buffer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, WIDTH, HEIGHT);
 
-	init(renderer);
+	init();
 
 	// process events until window is closed
 	SDL_Event event;
@@ -79,7 +81,7 @@ int main() {
 		SDL_SetRenderTarget(renderer, screen_buffer); 				// set render target to screen_buffer
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); 			// clear screen_buffer to black
 		SDL_RenderClear(renderer);
-		process(renderer); 											// render stuff to screen_buffer
+		process(); 													// render stuff to screen_buffer
 		SDL_SetRenderTarget(renderer, NULL); 						// reset render target back to window
 		SDL_RenderCopy(renderer, screen_buffer, NULL, &letterbox); 	// render screen_buffer
 		SDL_RenderPresent(renderer); 								// present rendered content to screen
