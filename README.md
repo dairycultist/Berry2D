@@ -2,12 +2,12 @@
 
 A berry good 2D game framework (C + SDL) which I will definitely make games with.
 
-320 × 200 (4:3)
+320 × 200 (4:3), 30fps, \<input\>
 
-render SDL_Textures with SDL_Renderer
+## Installation
 
-`clear()`
-
-`draw_sprite(x, y, texture_data, sprite_w, sprite_h)`
-
-`draw_text(string, x, y, texture_data, glyph_w, glyph_h)`
+```
+brew install sdl2
+brew install sdl2_image
+...
+```

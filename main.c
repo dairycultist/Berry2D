@@ -1,6 +1,10 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
-// gcc -o build main.c $(sdl2-config --libs) $(sdl2-config --cflags)
+// gcc -o build main.c -lSDL2_image $(sdl2-config --libs) $(sdl2-config --cflags)
+
+// draw_sprite(x, y, texture_data, sprite_w, sprite_h)
+// draw_text(string, x, y, texture_data, glyph_w, glyph_h)
 
 #define WIDTH 320
 #define HEIGHT 200
@@ -27,6 +31,8 @@ int main() {
 		printf("Error creating renderer:\n%s\n", SDL_GetError());
 		return 1;
 	}
+
+	SDL_Texture *texture = IMG_LoadTexture(renderer, "test.png");
 
 	// process events until window is closed
 	SDL_Event event;
