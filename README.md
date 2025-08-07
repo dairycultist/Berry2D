@@ -9,5 +9,5 @@ A berry good 2D game framework (C + SDL) which I will definitely make games with
 ```
 brew install sdl2
 brew install sdl2_image
-...
+gcc -o build main.c -lSDL2_image $(sdl2-config --libs) $(sdl2-config --cflags)
 ```
