@@ -30,6 +30,12 @@ void draw_sprite(Sprite *sprite, int x, int y) {
 	SDL_RenderCopy(renderer, sprite->sdl_texture, NULL, &texture_rect);
 }
 
+void free_sprite(Sprite *sprite) {
+	
+	SDL_DestroyTexture(sprite->sdl_texture);
+	free(sprite);
+}
+
 int main() {
 
 	printf("Starting Berry2D\n");
@@ -59,7 +65,7 @@ int main() {
 
 	// process events until window is closed
 	SDL_Event event;
-	SDL_Rect letterbox = {0, 0, WIDTH, HEIGHT}; // TODO dynamically change based on screen resize
+	SDL_Rect letterbox = {0, 0, WIDTH, HEIGHT};
 	char running = TRUE;
 
 	while (running) {
@@ -72,7 +78,9 @@ int main() {
 
 			} else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) {
 
+				// dynamically change letterbox based on screen resize
 				printf("Resized to %d x %d\n", event.window.data1, event.window.data2);
+
 			}
 		}
 
@@ -81,7 +89,7 @@ int main() {
 		SDL_SetRenderTarget(renderer, screen_buffer); 				// set render target to screen_buffer
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); 			// clear screen_buffer to black
 		SDL_RenderClear(renderer);
-		process(); 													// render stuff to screen_buffer
+		process(); 													// let the programmer do logic/render stuff to screen_buffer
 		SDL_SetRenderTarget(renderer, NULL); 						// reset render target back to window
 		SDL_RenderCopy(renderer, screen_buffer, NULL, &letterbox); 	// render screen_buffer
 		SDL_RenderPresent(renderer); 								// present rendered content to screen

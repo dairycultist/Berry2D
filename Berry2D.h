@@ -14,6 +14,7 @@ typedef struct {
  */
 Sprite *load_sprite(const char *path);
 void draw_sprite(Sprite *sprite, int x, int y);
+void free_sprite(Sprite *sprite);
 
 /*
  * Game-side implementation
