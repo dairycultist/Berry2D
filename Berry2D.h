@@ -7,11 +7,13 @@
 #define ASPECT_RATIO (WIDTH / (float) HEIGHT)
 
 // input bitwise operations
-#define UP_JUST_CHANGED(input)  ((input) & (1 << 14))
-#define UP_PRESSED(input)       ((input) & (1 << 15))
-#define UP_JUST_PRESSED(input)  (UP_JUST_CHANGED(input) && UP_PRESSED(input))
-#define UP_RELEASED(input)      (!UP_PRESSED(input))
-#define UP_JUST_RELEASED(input) (UP_JUST_CHANGED(input) && !UP_PRESSED(input))
+#define JUST_CHANGED(key, input)    ((input) & (1 << (key - 1)))
+#define PRESSED(key, input)         ((input) & (1 << key))
+#define JUST_PRESSED(key, input)    (JUST_CHANGED(key, input) && PRESSED(key, input))
+#define RELEASED(key, input)        (!PRESSED(key, input))
+#define JUST_RELEASED(key, input)   (JUST_CHANGED(key, input) && !PRESSED(key, input))
+
+#define UP 15
 
 // rendering datatypes
 typedef struct {

@@ -11,7 +11,7 @@ void init() {
 
 void process(unsigned long time, int input) {
 
-    if (UP_JUST_PRESSED(input)) {
+    if (JUST_PRESSED(UP, input)) {
         x += 30;
     }
 
