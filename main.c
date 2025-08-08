@@ -2,8 +2,6 @@
 #include <SDL2/SDL_image.h>
 #include "Berry2D.h"
 
-#define MIN(a, b) ((a) > (b) ? (b) : (a))
-
 #define TRUE 1
 #define FALSE 0
 
@@ -85,6 +83,8 @@ int main() {
 
 			} else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) {
 
+				#define MIN(a, b) ((a) > (b) ? (b) : (a))
+
 				// dynamically change letterbox based on screen resize
 				letterbox.w = MIN(event.window.data1, event.window.data2 * ASPECT_RATIO);
 				letterbox.h = MIN(event.window.data2, event.window.data1 / ASPECT_RATIO);
@@ -94,12 +94,20 @@ int main() {
 
 			} else if ((event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) && !event.key.repeat) {
 
-				if (event.key.keysym.scancode == SDL_SCANCODE_W) {
+				// first operation is changing 'pressed?' flag, second 'just changed?' flag (cleared on next frame)
+				#define GET_INPUT_FROM_KEYSTATE(pressed, key) ((pressed ? input | (1 << key) : input & ~(1 << key)) | (1 << (key - 1)))
 
-					// first operation is changing 'pressed?' flag, second 'just changed?' flag (cleared on next frame)
-					input = event.key.state == SDL_PRESSED ? input | (1 << UP) | (1 << (UP - 1)) : input & ~(1 << UP) | (1 << (UP - 1));
-				}
+				if (event.key.keysym.scancode == SDL_SCANCODE_W)
+					input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, UP);
 
+				if (event.key.keysym.scancode == SDL_SCANCODE_S)
+					input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, DOWN);
+
+				if (event.key.keysym.scancode == SDL_SCANCODE_A)
+					input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, LEFT);
+
+				if (event.key.keysym.scancode == SDL_SCANCODE_D)
+					input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, RIGHT);
 			}
 		}
 

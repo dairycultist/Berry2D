@@ -2,7 +2,7 @@
 
 static Sprite *test;
 
-static int x = 0;
+static int x = 30, y = 30;
 
 void init() {
 
@@ -11,9 +11,17 @@ void init() {
 
 void process(unsigned long time, int input) {
 
-    if (JUST_PRESSED(UP, input)) {
-        x += 30;
-    }
+    if (JUST_PRESSED(UP, input))
+        y -= 30;
 
-    draw_sprite(test, 30 + x, 30);
+    if (JUST_PRESSED(DOWN, input))
+        y += 30;
+
+    if (JUST_PRESSED(LEFT, input))
+        x -= 30;
+
+    if (JUST_PRESSED(RIGHT, input))
+        x += 30;
+
+    draw_sprite(test, x, y);
 }
