@@ -14,6 +14,9 @@
 #define JUST_RELEASED(key, input)   (JUST_CHANGED(key, input) && !PRESSED(key, input))
 
 #define UP 15
+#define DOWN 13
+#define LEFT 11
+#define RIGHT 9
 
 // rendering datatypes
 typedef struct {

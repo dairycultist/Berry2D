@@ -70,11 +70,11 @@ int main() {
 
 	unsigned long time = 0; // wraps to 0 at around 4.5 years
 
-	int input = 0; // at least 16 bytes, aka 8 pairs of PRESSED?-JUSTNOW?
+	int input = 0; // at least 16 bytes, aka 8 pairs of 'pressed?' and 'just changed?'
 
 	while (running) {
 
-		// clear 'just now' flag of every input
+		// clear 'just changed?' flag of every input
 		input = input & 0b0101010101010101;
 
 		while (SDL_PollEvent(&event)) {
@@ -96,13 +96,8 @@ int main() {
 
 				if (event.key.keysym.scancode == SDL_SCANCODE_W) {
 
-					if (event.key.state == SDL_PRESSED) { // pressed/released
-						input = input | (1 << 15);
-					} else {
-						input = input & ~(1 << 15);
-					}
-
-					input = input | (1 << 14); // set 'just now' flag (cleared by next frame)
+					// first operation is changing 'pressed?' flag, second 'just changed?' flag (cleared on next frame)
+					input = event.key.state == SDL_PRESSED ? input | (1 << UP) | (1 << (UP - 1)) : input & ~(1 << UP) | (1 << (UP - 1));
 				}
 
 			}
