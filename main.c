@@ -68,7 +68,7 @@ int main() {
 
 	unsigned long time = 0; // wraps to 0 at around 4.5 years
 
-	int input = 0; // at least 16 bytes, aka 8 pairs of 'pressed?' and 'just changed?'
+	int input = 0; // at least 16 bytes, aka 8 pairs of 'pressed?' and 'just changed?' flags (their positions are specified in Berry2D.h)
 
 	while (running) {
 
