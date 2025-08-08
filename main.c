@@ -2,6 +2,8 @@
 #include <SDL2/SDL_image.h>
 #include "Berry2D.h"
 
+#define MIN(a, b) ((a) > (b) ? (b) : (a))
+
 static SDL_Window *window;
 static SDL_Renderer *renderer;
 static SDL_Texture *screen_buffer;
@@ -73,8 +75,11 @@ int main() {
 			} else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) {
 
 				// dynamically change letterbox based on screen resize
-				printf("Resized to %d x %d\n", event.window.data1, event.window.data2);
+				letterbox.w = MIN(event.window.data1, event.window.data2 * ASPECT_RATIO);
+				letterbox.h = MIN(event.window.data2, event.window.data1 / ASPECT_RATIO);
 
+				letterbox.x = (event.window.data1 - letterbox.w) / 2;
+				letterbox.y = (event.window.data2 - letterbox.h) / 2;
 			}
 		}
 

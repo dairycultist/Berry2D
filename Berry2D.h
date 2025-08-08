@@ -3,6 +3,7 @@
 
 #define WIDTH 320
 #define HEIGHT 200
+#define ASPECT_RATIO (WIDTH / (float) HEIGHT)
 
 #define TRUE 1
 #define FALSE 0
