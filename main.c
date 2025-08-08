@@ -4,6 +4,9 @@
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 
+#define TRUE 1
+#define FALSE 0
+
 static SDL_Window *window;
 static SDL_Renderer *renderer;
 static SDL_Texture *screen_buffer;
@@ -64,9 +67,15 @@ int main() {
 	SDL_Rect letterbox = {0, 0, WIDTH, HEIGHT};
 
 	char running = TRUE;
+
 	unsigned long time = 0; // wraps to 0 at around 4.5 years
 
+	int input = 0; // at least 16 bytes, aka 8 pairs of PRESSED?-JUSTNOW?
+
 	while (running) {
+
+		// clear 'just now' flag of every input
+		input = input & 0b0101010101010101;
 
 		while (SDL_PollEvent(&event)) {
 
@@ -82,6 +91,20 @@ int main() {
 
 				letterbox.x = (event.window.data1 - letterbox.w) / 2;
 				letterbox.y = (event.window.data2 - letterbox.h) / 2;
+
+			} else if ((event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) && !event.key.repeat) {
+
+				if (event.key.keysym.scancode == SDL_SCANCODE_W) {
+
+					if (event.key.state == SDL_PRESSED) { // pressed/released
+						input = input | (1 << 15);
+					} else {
+						input = input & ~(1 << 15);
+					}
+
+					input = input | (1 << 14); // set 'just now' flag (cleared by next frame)
+				}
+
 			}
 		}
 
@@ -90,7 +113,7 @@ int main() {
 		SDL_SetRenderTarget(renderer, screen_buffer); 				// set render target to screen_buffer
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); 			// clear screen_buffer to black
 		SDL_RenderClear(renderer);
-		process(time++); 											// let the programmer do logic/render stuff to screen_buffer
+		process(time++, input); 									// let the programmer do logic/render stuff to screen_buffer
 		SDL_SetRenderTarget(renderer, NULL); 						// reset render target back to window
 		SDL_RenderCopy(renderer, screen_buffer, NULL, &letterbox); 	// render screen_buffer
 		SDL_RenderPresent(renderer); 								// present rendered content to screen

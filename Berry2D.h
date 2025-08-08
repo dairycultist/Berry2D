@@ -1,13 +1,19 @@
 #ifndef BERRY2D
 #define BERRY2D
 
+// screen size
 #define WIDTH 320
 #define HEIGHT 200
 #define ASPECT_RATIO (WIDTH / (float) HEIGHT)
 
-#define TRUE 1
-#define FALSE 0
+// input bitwise operations
+#define UP_JUST_CHANGED(input)  ((input) & (1 << 14))
+#define UP_PRESSED(input)       ((input) & (1 << 15))
+#define UP_JUST_PRESSED(input)  (UP_JUST_CHANGED(input) && UP_PRESSED(input))
+#define UP_RELEASED(input)      (!UP_PRESSED(input))
+#define UP_JUST_RELEASED(input) (UP_JUST_CHANGED(input) && !UP_PRESSED(input))
 
+// rendering datatypes
 typedef struct {
 
     void *sdl_texture;
@@ -35,4 +41,4 @@ void free_sprite(Sprite *sprite);
  * Game-side implementation
  */
 void init();
-void process(unsigned long time); // will also contain booleans for input
+void process(unsigned long time, int input);
