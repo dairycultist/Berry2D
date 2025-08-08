@@ -62,7 +62,9 @@ int main() {
 	// process events until window is closed
 	SDL_Event event;
 	SDL_Rect letterbox = {0, 0, WIDTH, HEIGHT};
+
 	char running = TRUE;
+	unsigned long time = 0; // wraps to 0 at around 4.5 years
 
 	while (running) {
 
@@ -88,7 +90,7 @@ int main() {
 		SDL_SetRenderTarget(renderer, screen_buffer); 				// set render target to screen_buffer
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); 			// clear screen_buffer to black
 		SDL_RenderClear(renderer);
-		process(); 													// let the programmer do logic/render stuff to screen_buffer
+		process(time++); 											// let the programmer do logic/render stuff to screen_buffer
 		SDL_SetRenderTarget(renderer, NULL); 						// reset render target back to window
 		SDL_RenderCopy(renderer, screen_buffer, NULL, &letterbox); 	// render screen_buffer
 		SDL_RenderPresent(renderer); 								// present rendered content to screen

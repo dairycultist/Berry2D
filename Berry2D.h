@@ -35,4 +35,4 @@ void free_sprite(Sprite *sprite);
  * Game-side implementation
  */
 void init();
-void process(); // will also contain booleans for input
+void process(unsigned long time); // will also contain booleans for input
