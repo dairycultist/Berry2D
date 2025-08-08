@@ -1,6 +1,12 @@
 #ifndef BERRY2D
 #define BERRY2D
 
+#define WIDTH 320
+#define HEIGHT 200
+
+#define TRUE 1
+#define FALSE 0
+
 typedef struct {
 
     void *sdl_texture;

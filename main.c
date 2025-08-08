@@ -2,12 +2,6 @@
 #include <SDL2/SDL_image.h>
 #include "Berry2D.h"
 
-#define WIDTH 320
-#define HEIGHT 200
-
-#define TRUE 1
-#define FALSE 0
-
 static SDL_Window *window;
 static SDL_Renderer *renderer;
 static SDL_Texture *screen_buffer;
