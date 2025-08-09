@@ -19,8 +19,25 @@ brew install sdl2_image
 
 ### Setting up your workspace
 
-Clone the repository, build a `.o` file from the framework, implement a script including \<Berry2D.h\>, then compile it all together
+1. Clone the repository.
 
 ```
-gcc -o build demo.c Berry2D.c -lSDL2_image $(sdl2-config --libs) $(sdl2-config --cflags)
+git clone https://github.com/dairycultist/Berry2D
+cd Berry2D
+```
+
+2. Build a `.o` file from the framework (and optionally delete the source file).
+
+```
+gcc -c -o Berry2D.o Berry2D.c $(sdl2-config --cflags)
+rm Berry2D.c
+```
+
+3. Implement a script including `Berry2D.h` (see `demo.c` for an example).
+
+4. Compile your script(s) together with `Berry2D.o` and run the build (replace `[YOUR_SCRIPTS]` with `demo.c` to compile the demo).
+
+```
+gcc [YOUR_SCRIPTS] -o build Berry2D.o -lSDL2_image $(sdl2-config --libs)
+./build
 ```
