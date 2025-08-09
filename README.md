@@ -31,9 +31,16 @@ gcc -c -o Berry2D.o Berry2D.c $(sdl2-config --cflags)
 rm Berry2D.c
 ```
 
-3. Implement a script including `Berry2D.h` (see `demo.c` for an example).
+3. (Optional) compile and run the demo to ensure prerequisites are linked correctly.
 
-4. Compile your script(s) together with `Berry2D.o` and run the build (replace `[YOUR_SCRIPTS]` with `demo.c` to compile the demo).
+```
+gcc demo.c -o build Berry2D.o -lSDL2_image $(sdl2-config --libs)
+./build
+```
+
+4. Implement a script including `Berry2D.h` (see `demo.c` for an example).
+
+5. Compile your script(s) together with `Berry2D.o` and run the build.
 
 ```
 gcc [YOUR_SCRIPTS] -o build Berry2D.o -lSDL2_image $(sdl2-config --libs)
