@@ -1,3 +1,6 @@
+// this file will end up with all the comments needed to fully explain how to use
+// Berry2D, but for now I'm lazy
+
 #ifndef BERRY2D
 #define BERRY2D
 
@@ -48,7 +51,7 @@ void free_sprite(Sprite *sprite);
 SpriteSheet *load_sprite_sheet(const char *path, int sprite_width, int sprite_height, int sprites_per_row);
 void draw_sprite_from_sheet(SpriteSheet *sprite_sheet, int index, int x, int y);
 // void draw_grid(SpriteSheet *sprite_sheet, int sprite_wide, int sprite_high, int *indices);
-// draw_text(SpriteSheet *sprite_sheet, char *text, int x, int y); // text sprite sheets should follow a specific format
+void draw_text(SpriteSheet *sprite_sheet, char *text, int x, int y); // text sprite sheets should follow a specific format
 void free_sprite_sheet(SpriteSheet *sprite_sheet);
 
 /*

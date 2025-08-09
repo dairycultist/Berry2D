@@ -61,6 +61,33 @@ void draw_sprite_from_sheet(SpriteSheet *sprite_sheet, int index, int x, int y) 
 	SDL_RenderCopy(renderer, sprite_sheet->sdl_texture, &copy_rect, &paste_rect);
 }
 
+void draw_text(SpriteSheet *sprite_sheet, char *text, int x, int y) {
+
+	int start_x = x;
+
+	while (*text) {
+
+		if (*text >= 'A' && *text <= 'Z') {
+
+			draw_sprite_from_sheet(sprite_sheet, *text - 65, x, y);
+			x += sprite_sheet->sprite_w;
+		}
+
+		else if (*text == '\n') {
+
+			x = start_x;
+			y += sprite_sheet->sprite_h;
+		}
+
+		else if (*text == ' ') {
+
+			x += sprite_sheet->sprite_w;
+		}
+
+		text++;
+	}
+}
+
 void free_sprite_sheet(SpriteSheet *sprite_sheet) {
 
 	SDL_DestroyTexture(sprite_sheet->sdl_texture);
