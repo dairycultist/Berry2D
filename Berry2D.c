@@ -61,6 +61,23 @@ void draw_sprite_from_sheet(SpriteSheet *sprite_sheet, int index, int x, int y) 
 	SDL_RenderCopy(renderer, sprite_sheet->sdl_texture, &copy_rect, &paste_rect);
 }
 
+void draw_grid(SpriteSheet *sprite_sheet, int *indices, int indices_width, int indices_height, int x, int y) {
+
+	int i, j;
+
+	for (i = 0; i < indices_width; i++) {
+		for (j = 0; j < indices_height; j++) {
+		
+			draw_sprite_from_sheet(
+				sprite_sheet,
+				indices[i + j * indices_width],
+				x + i * sprite_sheet->sprite_w,
+				y + j * sprite_sheet->sprite_h
+			);
+		}
+	}
+}
+
 void draw_text(SpriteSheet *sprite_sheet, char *text, int x, int y) {
 
 	int start_x = x;
