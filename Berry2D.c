@@ -49,6 +49,17 @@ SpriteSheet *load_sprite_sheet(const char *path, int sprite_width, int sprite_he
 
 void draw_sprite_from_sheet(SpriteSheet *sprite_sheet, int index, int x, int y) {
 
+	SDL_Rect copy_rect = {
+
+		(index % sprite_sheet->x_count) * sprite_sheet->sprite_w,
+		(index / sprite_sheet->y_count) * sprite_sheet->sprite_h,
+		sprite_sheet->sprite_w,
+		sprite_sheet->sprite_h
+	};
+
+	SDL_Rect paste_rect = { x, y, sprite_sheet->sprite_w, sprite_sheet->sprite_h };
+
+	SDL_RenderCopy(renderer, sprite_sheet->sdl_texture, &copy_rect, &paste_rect);
 }
 
 void free_sprite_sheet(SpriteSheet *sprite_sheet) {
