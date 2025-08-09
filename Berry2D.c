@@ -87,7 +87,7 @@ int main() {
 	while (running) {
 
 		// clear 'just changed?' flag of every input
-		input = input & 0b0101010101010101;
+		input = input & 0b1010101010101010;
 
 		while (SDL_PollEvent(&event)) {
 
