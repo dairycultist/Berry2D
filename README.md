@@ -1,6 +1,4 @@
-# Berry2D
-
-A berry good 2D game framework (C + SDL) which I will definitely make games with.
+# A Berry Good 2D Game Framework
 
 320 × 200 (4:3), 30fps, D-pad
 
