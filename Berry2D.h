@@ -27,6 +27,16 @@ typedef struct {
 
 } Sprite;
 
+typedef struct {
+
+    void *sdl_texture;
+    int w;          // sprite width (pixels)
+    int h;          // sprite height
+    int w_count;    // sprites wide (how many sprites are there per row)
+    int h_count;    // sprites high
+
+} SpriteSheet;
+
 #endif
 
 /*
@@ -36,11 +46,11 @@ Sprite *load_sprite(const char *path);
 void draw_sprite(Sprite *sprite, int x, int y);
 void free_sprite(Sprite *sprite);
 
-// draw_sprite(x, y, texture_data, sprite_w, sprite_h)
-// draw_text(string, x, y, texture_data, glyph_w, glyph_h)
-
-// Tileset *load_tileset(const char *path, int tiles_wide, int tiles_high)
-// void draw_tileset(Tileset *tileset, int width, int height, char *tiles)
+SpriteSheet *load_sprite_sheet(const char *path, int sprite_width, int sprite_height, int sprites_wide, int sprites_high);
+void draw_sprite_from_sheet(SpriteSheet *sprite_sheet, int index, int x, int y);
+// void draw_grid(SpriteSheet *sprite_sheet, int sprite_wide, int sprite_high, int *indices);
+// draw_text(SpriteSheet *sprite_sheet, char *text, int x, int y); // text sprite sheets should follow a specific format
+void free_sprite_sheet(SpriteSheet *sprite_sheet);
 
 /*
  * Game-side implementation

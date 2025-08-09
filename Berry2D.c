@@ -33,6 +33,20 @@ void free_sprite(Sprite *sprite) {
 	free(sprite);
 }
 
+SpriteSheet *load_sprite_sheet(const char *path, int sprite_width, int sprite_height, int sprites_wide, int sprites_high) {
+
+}
+
+void draw_sprite_from_sheet(SpriteSheet *sprite_sheet, int index, int x, int y) {
+
+}
+
+void free_sprite_sheet(SpriteSheet *sprite_sheet) {
+
+	SDL_DestroyTexture(sprite_sheet->sdl_texture);
+	free(sprite_sheet);
+}
+
 int main() {
 
 	printf("Starting Berry2D\n");
