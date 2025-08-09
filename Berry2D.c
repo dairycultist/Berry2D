@@ -68,6 +68,7 @@ void draw_grid(SpriteSheet *sprite_sheet, int *indices, int indices_width, int i
 	for (i = 0; i < indices_width; i++) {
 		for (j = 0; j < indices_height; j++) {
 		
+			// TODO only draw IF the tile will actually be on screen. maybe calculate i,j bounds to do that
 			draw_sprite_from_sheet(
 				sprite_sheet,
 				indices[i + j * indices_width],

@@ -3,7 +3,7 @@
 static SpriteSheet *test;
 static SpriteSheet *font;
 
-static int x = 30, y = 30;
+static int x = 30, y = 80;
 
 static int grid[] = {
     0, 1, 2, 3,
@@ -35,5 +35,5 @@ void process(unsigned long time, int input) {
     draw_sprite_from_sheet(test, (time / 8) % 4, x, y);
 
     draw_grid(test, grid, 4, 4, 20, 20);
-    draw_text(font, "HELLO WORLD\nNEWLINE", 20, 20);
+    draw_text(font, "YOU CAN DRAW TEXT\nINDIVIDUAL SPRITES\nSPRITES FROM SPRITE SHEETS THAT\nMAKE ANIMATION EASIER\nAND GRIDS OF SPRITES\n\nALSO USE WASD TO MOVE", 80, 20);
 }
