@@ -30,10 +30,9 @@ typedef struct {
 typedef struct {
 
     void *sdl_texture;
-    int sprite_w;   // sprite width (pixels)
-    int sprite_h;   // sprite height
-    int x_count;    // sprites wide (how many sprites are there per row)
-    int y_count;    // sprites high
+    int sprite_w;
+    int sprite_h;
+    int sprites_per_row;
 
 } SpriteSheet;
 
@@ -46,7 +45,7 @@ Sprite *load_sprite(const char *path);
 void draw_sprite(Sprite *sprite, int x, int y);
 void free_sprite(Sprite *sprite);
 
-SpriteSheet *load_sprite_sheet(const char *path, int sprite_width, int sprite_height, int x_count, int y_count);
+SpriteSheet *load_sprite_sheet(const char *path, int sprite_width, int sprite_height, int sprites_per_row);
 void draw_sprite_from_sheet(SpriteSheet *sprite_sheet, int index, int x, int y);
 // void draw_grid(SpriteSheet *sprite_sheet, int sprite_wide, int sprite_high, int *indices);
 // draw_text(SpriteSheet *sprite_sheet, char *text, int x, int y); // text sprite sheets should follow a specific format
