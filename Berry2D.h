@@ -16,10 +16,13 @@
 #define RELEASED(key, input)        (!PRESSED(key, input))
 #define JUST_RELEASED(key, input)   (JUST_CHANGED(key, input) && !PRESSED(key, input))
 
-#define UP 15
+#define UP 15       // arrow keys
 #define DOWN 13
 #define LEFT 11
 #define RIGHT 9
+#define CONFIRM 7   // Z
+#define CANCEL 5    // X
+#define MENU 3      // C
 
 // rendering datatypes
 typedef struct {

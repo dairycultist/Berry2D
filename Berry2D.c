@@ -176,17 +176,26 @@ int main() {
 				// first operation is changing 'pressed?' flag, second 'just changed?' flag (cleared on next frame)
 				#define GET_INPUT_FROM_KEYSTATE(pressed, key) ((pressed ? input | (1 << key) : input & ~(1 << key)) | (1 << (key - 1)))
 
-				if (event.key.keysym.scancode == SDL_SCANCODE_W)
+				if (event.key.keysym.scancode == SDL_SCANCODE_UP)
 					input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, UP);
 
-				if (event.key.keysym.scancode == SDL_SCANCODE_S)
+				if (event.key.keysym.scancode == SDL_SCANCODE_DOWN)
 					input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, DOWN);
 
-				if (event.key.keysym.scancode == SDL_SCANCODE_A)
+				if (event.key.keysym.scancode == SDL_SCANCODE_LEFT)
 					input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, LEFT);
 
-				if (event.key.keysym.scancode == SDL_SCANCODE_D)
+				if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT)
 					input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, RIGHT);
+
+				if (event.key.keysym.scancode == SDL_SCANCODE_Z)
+					input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, CONFIRM);
+
+				if (event.key.keysym.scancode == SDL_SCANCODE_X)
+					input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, CANCEL);
+
+				if (event.key.keysym.scancode == SDL_SCANCODE_C)
+					input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, MENU);
 			}
 		}
 
