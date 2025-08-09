@@ -33,8 +33,18 @@ void free_sprite(Sprite *sprite) {
 	free(sprite);
 }
 
-SpriteSheet *load_sprite_sheet(const char *path, int sprite_width, int sprite_height, int sprites_wide, int sprites_high) {
+SpriteSheet *load_sprite_sheet(const char *path, int sprite_width, int sprite_height, int x_count, int y_count) {
 
+	SpriteSheet *sprite_sheet = malloc(sizeof(SpriteSheet));
+
+	sprite_sheet->sdl_texture = IMG_LoadTexture(renderer, path);
+
+	sprite_sheet->sprite_w = sprite_width;
+	sprite_sheet->sprite_h = sprite_height;
+	sprite_sheet->x_count = x_count;
+	sprite_sheet->y_count = y_count;
+
+	return sprite_sheet;
 }
 
 void draw_sprite_from_sheet(SpriteSheet *sprite_sheet, int index, int x, int y) {

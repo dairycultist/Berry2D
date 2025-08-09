@@ -1,12 +1,12 @@
 #include "Berry2D.h"
 
-static Sprite *test;
+static SpriteSheet *test;
 
 static int x = 30, y = 30;
 
 void init() {
 
-	test = load_sprite("test.png");
+	test = load_sprite_sheet("test.png", 16, 16, 2, 2);
 }
 
 void process(unsigned long time, int input) {
@@ -23,5 +23,5 @@ void process(unsigned long time, int input) {
     if (PRESSED(RIGHT, input))
         x += 1;
 
-    draw_sprite(test, x, y);
+    draw_sprite_from_sheet(test, time % 4, x, y);
 }
