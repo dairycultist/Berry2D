@@ -1,3 +1,11 @@
+# PIVOT
+
+pivoting from a framework (no one, not even me, is gonna use it anyways) to a platformer engine, like [Super Mario Bros. Remastered](https://github.com/JHDev2006/Super-Mario-Bros.-Remastered-Public)
+
+- base game with player characters and levels
+- modded player characters (allowing for stuff like [this](https://bsky.app/profile/honeyswells.bsky.social/post/3lz74rivjmk24))
+- level editor which exports level file
+
 # A Berry Good 2D Game Framework
 
 320 × 200 (4:3), 30fps, D-pad
