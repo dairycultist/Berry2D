@@ -37,10 +37,10 @@ void init() {
 
 static int player_collides_when_at(int x, int y) {
 
-	if (x < 0 || x >= LEVEL_WIDTH * 16)
+	if (x < 0 || x + 15 >= LEVEL_WIDTH * 16)
 		return 1;
 
-	if (y < 0 || y >= LEVEL_HEIGHT * 16)
+	if (y < 0 || y + 15 >= LEVEL_HEIGHT * 16)
 		return 0;
 
 	return sprite_indices[x / 16 + y / 16 * LEVEL_WIDTH]
@@ -52,7 +52,7 @@ static int player_collides_when_at(int x, int y) {
 void process(unsigned long time, int input) {
 
 	// jumping
-    if (JUST_PRESSED(UP, input)) {
+    if (JUST_PRESSED(UP, input) && player_collides_when_at(player_x, player_y + 8)) {
 
         player_dy = -3.0;
 		time_of_last_jump = time;
