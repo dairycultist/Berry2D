@@ -245,3 +245,57 @@ void free_sprite_sheet(SpriteSheet *sprite_sheet) {
 	SDL_DestroyTexture(sprite_sheet->sdl_texture);
 	free(sprite_sheet);
 }
+
+static int get_from_indices(int *indices, int indices_width, int indices_height, int x, int y) {
+
+	if (x < 0 || x >= indices_width || y < 0 || y >= indices_height) {
+		return 0;
+	}
+
+	return indices[x + y * indices_width];
+}
+
+void convert_indices_to_9_tile(int *indices, int indices_width, int indices_height) {
+
+	int up, down, left, right;
+
+	for (int x = 0; x < indices_width; x++) {
+		for (int y = 0; y < indices_height; y++) {
+
+			if (indices[x + y * indices_width] == 0) {
+				continue;
+			}
+
+			up = get_from_indices(indices, indices_width, indices_height, x, y - 1);
+			down = get_from_indices(indices, indices_width, indices_height, x, y + 1);
+			left = get_from_indices(indices, indices_width, indices_height, x - 1, y);
+			right = get_from_indices(indices, indices_width, indices_height, x + 1, y);
+
+			if (!up) {
+				if (!left) {
+					indices[x + y * indices_width] = 9;
+				} else if (!right) {
+					indices[x + y * indices_width] = 11;
+				} else {
+					indices[x + y * indices_width] = 10;
+				}
+			} else if (!down) {
+				if (!left) {
+					indices[x + y * indices_width] = 25;
+				} else if (!right) {
+					indices[x + y * indices_width] = 27;
+				} else {
+					indices[x + y * indices_width] = 26;
+				}
+			} else {
+				if (!left) {
+					indices[x + y * indices_width] = 17;
+				} else if (!right) {
+					indices[x + y * indices_width] = 19;
+				} else {
+					indices[x + y * indices_width] = 18;
+				}
+			}
+		}
+	}
+}

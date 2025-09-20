@@ -11,17 +11,19 @@ static unsigned long time_of_last_jump;
 #define MAX_RUN_SPEED 2.5
 #define SLIPPERINESS 0.97
 
-static int grid[] = {
-    1, 2, 3, 0,
-    9, 10, 11, 0,
-    17, 18, 19, 0,
-    0, 0, 0, 0
+static int tile_indices[] = {
+    1, 1, 1, 0,
+    1, 1, 1, 0,
+    1, 1, 1, 1,
+    0, 0, 1, 1
 };
 
 void init() {
 
-	tiles = load_sprite_sheet("res/tiles.png", 16, 16);
+	tiles = load_sprite_sheet("res/tilemap_template.png", 16, 16);
     font = load_sprite_sheet("res/font.png", 6, 7);
+
+	convert_indices_to_9_tile(tile_indices, 4, 4);
 
 	set_clear_color(25, 25, 80);
 }
@@ -50,9 +52,10 @@ void process(unsigned long time, int input) {
 	player_x += player_dx;
 	player_y += player_dy;
 
-	draw_grid(tiles, grid, 4, 4, 0, 0);
+	// render
+	draw_grid(tiles, tile_indices, 4, 4, 0, 0);
 
-	draw_sprite_from_sheet(tiles, 8, (int) player_x, (int) player_y);
+	draw_sprite_from_sheet(tiles, 32, (int) player_x, (int) player_y);
 
     draw_text(font, "ARROW KEYS TO MOVE\nZ IS CONFIRM\nX IS CANCEL\nC IS MENU", 100, 20);
 }
