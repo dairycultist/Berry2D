@@ -21,7 +21,7 @@ static unsigned long time_of_last_grounded;
 
 #define ABS(x) ((x) > 0 ? (x) : -(x))
 
-static int sprite_indices[LEVEL_WIDTH * LEVEL_HEIGHT];
+static int sprite_indices[LEVEL_WIDTH * LEVEL_HEIGHT]; // TODO tile type grid that generates multiple tile (texture) indices grids (one for each type)
 
 void init() {
 
