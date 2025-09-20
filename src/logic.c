@@ -121,7 +121,7 @@ void process(unsigned long time, int input) {
 	// render
 	draw_grid(grid_sprites, sprite_indices, LEVEL_WIDTH, LEVEL_HEIGHT, -camera_x, 0);
 
-	draw_sprite_from_sheet(player_sprite, 0, (int) player_x - camera_x, (int) player_y);
+	draw_sprite_from_sheet(player_sprite, ABS(player_dx) < 0.2 ? 0 : 1 + ((time * ((int) ABS(player_dx) + 1) / 20) % 2), (int) player_x - camera_x, (int) player_y);
 
     draw_text(font, "ARROW KEYS TO MOVE\nZ IS CONFIRM\nX IS CANCEL\nC IS MENU", 100, 20);
 }
