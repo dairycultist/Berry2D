@@ -4,13 +4,18 @@
 static SpriteSheet *tiles;
 static SpriteSheet *font;
 
-static int x = 30, y = 80;
+static float player_x = 30, player_y = 80;
+static float player_dx = 0, player_dy = 0;
+static unsigned long time_of_last_jump;
+
+#define MAX_RUN_SPEED 2.5
+#define SLIPPERINESS 0.97
 
 static int grid[] = {
-    0, 1, 2, 3,
-    4, 5, 6, 7,
-    8, 9, 10, 7,
-    7, 7, 7, 7
+    1, 2, 3, 0,
+    9, 10, 11, 0,
+    17, 18, 19, 0,
+    0, 0, 0, 0
 };
 
 void init() {
@@ -23,19 +28,31 @@ void init() {
 
 void process(unsigned long time, int input) {
 
-    if (PRESSED(UP, input))
-        y -= PRESSED(CONFIRM, input) ? 2 : 1;
+	// jumping
+    if (JUST_PRESSED(UP, input)) {
 
-    if (PRESSED(DOWN, input))
-        y += PRESSED(CONFIRM, input) ? 2 : 1;
+        player_dy = -3.0;
+		time_of_last_jump = time;
+	}
 
-    if (PRESSED(LEFT, input))
-        x -= PRESSED(CONFIRM, input) ? 2 : 1;
+	// gravity (less if 1. holding jump and 2. recently jumped)
+	player_dy += (time - time_of_last_jump) < 20 && PRESSED(UP, input) ? 0.04 : 0.08;
 
-    if (PRESSED(RIGHT, input))
-        x += PRESSED(CONFIRM, input) ? 2 : 1;
+	// running
+    if (PRESSED(LEFT, input) && !PRESSED(RIGHT, input))
+        player_dx = player_dx * SLIPPERINESS - MAX_RUN_SPEED * (1.0 - SLIPPERINESS);
+    else if (PRESSED(RIGHT, input) && !PRESSED(LEFT, input))
+        player_dx = player_dx * SLIPPERINESS + MAX_RUN_SPEED * (1.0 - SLIPPERINESS);
+	else
+		player_dx *= SLIPPERINESS;
 
-	draw_grid(tiles, grid, 4, 4, x, y);
+	// move player (TODO check for collision)
+	player_x += player_dx;
+	player_y += player_dy;
+
+	draw_grid(tiles, grid, 4, 4, 0, 0);
+
+	draw_sprite_from_sheet(tiles, 8, (int) player_x, (int) player_y);
 
     draw_text(font, "ARROW KEYS TO MOVE\nZ IS CONFIRM\nX IS CANCEL\nC IS MENU", 100, 20);
 }
