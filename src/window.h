@@ -42,6 +42,7 @@ typedef struct {
 
 } SpriteSheet;
 
+// rendering function prototypes
 Sprite *load_sprite(const char *path);
 void draw_sprite(Sprite *sprite, int x, int y);
 void free_sprite(Sprite *sprite);
@@ -49,6 +50,7 @@ void free_sprite(Sprite *sprite);
 SpriteSheet *load_sprite_sheet(const char *path, int sprite_width, int sprite_height, int sprites_per_row);
 void draw_sprite_from_sheet(SpriteSheet *sprite_sheet, int index, int x, int y);
 void draw_grid(SpriteSheet *sprite_sheet, int *indices, int indices_width, int indices_height, int x, int y);
-void draw_text(SpriteSheet *sprite_sheet, char *text, int x, int y); // text sprite sheets should follow a specific format
+void draw_text(SpriteSheet *sprite_sheet, char *text, int x, int y);
 void free_sprite_sheet(SpriteSheet *sprite_sheet);
+
 #endif

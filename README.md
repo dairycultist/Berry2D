@@ -1,4 +1,4 @@
-# PIVOT
+# Berry2D (working title?)
 
 pivoting from a framework (no one, not even me, is gonna use it anyways) to a platformer engine, like [Super Mario Bros. Remastered](https://github.com/JHDev2006/Super-Mario-Bros.-Remastered-Public)
 
@@ -6,11 +6,7 @@ pivoting from a framework (no one, not even me, is gonna use it anyways) to a pl
 - modded player characters (allowing for stuff like [this](https://bsky.app/profile/honeyswells.bsky.social/post/3lz74rivjmk24))
 - level editor which exports level file
 
-# A Berry Good 2D Game Framework
-
-320 × 200 (4:3), 30fps, D-pad
-
-the cool part is that the game logic and underlying graphics/input calls (handled by SDL) are completely separate, meaning you could rewrite the latter (i.e. for a different platform) while maintaining compatibility with the former
+320 × 200 (4:3), 60fps, D-pad + 3 action buttons
 
 ## Using Berry2D
 
@@ -25,15 +21,10 @@ brew install sdl2_image
 
 ### Install
 
-1. Clone the repository.
-
 ```
 git clone https://github.com/dairycultist/Berry2D
 cd Berry2D
-```
-
-2. Build the executable.
-
-```
 make
 ```
+
+This should create a folder called `Berry2D` with an executable inside called `build` which runs the game.
