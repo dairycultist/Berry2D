@@ -8,7 +8,10 @@ static int camera_x = 0;
 
 static float player_x = 50, player_y = 50;
 static float player_dx = 0, player_dy = 0;
+
 static unsigned long time_of_last_jump;
+static unsigned long time_of_last_pressed_jump;
+static unsigned long time_of_last_grounded;
 
 #define MAX_RUN_SPEED 2.5
 #define SLIPPERINESS 0.97
@@ -53,16 +56,29 @@ static int player_collides_when_at(int x, int y) {
 
 void process(unsigned long time, int input) {
 
-	// jumping
-    if (JUST_PRESSED(UP, input) && player_collides_when_at(player_x, player_y + 8)) {
+    if (JUST_PRESSED(UP, input)) {
 
-        player_dy = -3.0;
+		// register a jump at this time
+		time_of_last_pressed_jump = time;
+	}
+
+	if (player_collides_when_at(player_x, player_y + 1)) {
+
+		// register grounded at this time
+		time_of_last_grounded = time;
+	}
+
+	// if recently pressed jump (input caching) AND recently was on ground (coyote time), jump
+	if (time - time_of_last_pressed_jump < 10 && time - time_of_last_grounded < 10) {
+
+		player_dy = -3.0;
 		time_of_last_jump = time;
+		time_of_last_grounded = 0;
 	}
 
 	// gravity (if recently jumped, make gravity lesser if holding jump, otherwise greater)
 	// ("recently jumped" is longer the faster you're running)
-	if ((time - time_of_last_jump) < 12 + ABS(player_dx) * 4) {
+	if ((time - time_of_last_jump) < 12 + ABS(player_dx) * 2) {
 
 		if (PRESSED(UP, input)) {
 			player_dy += 0.04;
