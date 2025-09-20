@@ -1,6 +1,7 @@
 #include "window.h"
 #include "logic.h"
 
+static SpriteSheet *player_sprite;
 static SpriteSheet *grid_sprites;
 static SpriteSheet *font;
 
@@ -25,6 +26,7 @@ static int sprite_indices[LEVEL_WIDTH * LEVEL_HEIGHT]; // TODO tile type grid th
 
 void init() {
 
+	player_sprite = load_sprite_sheet("res/char.png", 16, 32);
 	grid_sprites = load_sprite_sheet("res/tiles.png", 16, 16);
     font = load_sprite_sheet("res/font.png", 6, 7);
 
@@ -37,21 +39,24 @@ void init() {
 
 	connect_indices(sprite_indices, LEVEL_WIDTH, LEVEL_HEIGHT);
 
-	set_clear_color(25, 25, 80);
+	set_clear_color(65, 65, 120);
 }
 
-static int player_collides_when_at(int x, int y) {
+static int aabb_collides(int w, int h, int x, int y) {
 
-	if (x < 0 || x + 15 >= LEVEL_WIDTH * 16)
+	w--;
+	h--;
+
+	if (x < 0 || x + w >= LEVEL_WIDTH * 16)
 		return 1;
 
-	if (y < 0 || y + 15 >= LEVEL_HEIGHT * 16)
+	if (y < 0 || y + h >= LEVEL_HEIGHT * 16)
 		return 0;
 
 	return sprite_indices[x / 16 + y / 16 * LEVEL_WIDTH]
-		|| sprite_indices[(x + 15) / 16 + y / 16 * LEVEL_WIDTH]
-		|| sprite_indices[x / 16 + (y + 15) / 16 * LEVEL_WIDTH]
-		|| sprite_indices[(x + 15) / 16 + (y + 15) / 16 * LEVEL_WIDTH];
+		|| sprite_indices[(x + w) / 16 + y / 16 * LEVEL_WIDTH]
+		|| sprite_indices[x / 16 + (y + h) / 16 * LEVEL_WIDTH]
+		|| sprite_indices[(x + w) / 16 + (y + h) / 16 * LEVEL_WIDTH];
 }
 
 void process(unsigned long time, int input) {
@@ -62,7 +67,7 @@ void process(unsigned long time, int input) {
 		time_of_last_pressed_jump = time;
 	}
 
-	if (player_collides_when_at(player_x, player_y + 1)) {
+	if (aabb_collides(16, 32, player_x, player_y + 1)) {
 
 		// register grounded at this time
 		time_of_last_grounded = time;
@@ -98,12 +103,12 @@ void process(unsigned long time, int input) {
 		player_dx *= SLIPPERINESS;
 
 	// move player w/ collision
-	while (player_collides_when_at(player_x + player_dx, player_y)) {
+	while (aabb_collides(16, 32, player_x + player_dx, player_y)) {
 		player_dx *= 0.7;
 	}
 	player_x += player_dx;
 
-	while (player_collides_when_at(player_x, player_y + player_dy)) {
+	while (aabb_collides(16, 32, player_x, player_y + player_dy)) {
 		player_dy *= 0.7;
 	}
 	player_y += player_dy;
@@ -116,7 +121,7 @@ void process(unsigned long time, int input) {
 	// render
 	draw_grid(grid_sprites, sprite_indices, LEVEL_WIDTH, LEVEL_HEIGHT, -camera_x, 0);
 
-	draw_sprite_from_sheet(grid_sprites, 32, (int) player_x - camera_x, (int) player_y);
+	draw_sprite_from_sheet(player_sprite, 0, (int) player_x - camera_x, (int) player_y);
 
     draw_text(font, "ARROW KEYS TO MOVE\nZ IS CONFIRM\nX IS CANCEL\nC IS MENU", 100, 20);
 }
