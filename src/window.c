@@ -191,10 +191,17 @@ void draw_grid(SpriteSheet *sprite_sheet, int *indices, int indices_width, int i
 
 	int i, j;
 
-	for (i = 0; i < indices_width; i++) {
-		for (j = 0; j < indices_height; j++) {
+	// calculate bounds of indices array that will actually be on screen
+	int i_start = x >= 0 ? 0 : -x / sprite_sheet->sprite_w;
+	int j_start = y >= 0 ? 0 : -y / sprite_sheet->sprite_h;
+
+	int i_end = WIDTH >= (indices_width + 1) * sprite_sheet->sprite_w + x ? indices_width : indices_width + (WIDTH - indices_width * sprite_sheet->sprite_w - x) / sprite_sheet->sprite_w;
+	int j_end = HEIGHT >= (indices_height + 1) * sprite_sheet->sprite_h + y ? indices_height : indices_height + (HEIGHT - indices_height * sprite_sheet->sprite_h - y) / sprite_sheet->sprite_h;
+
+	// draw
+	for (i = i_start; i < i_end; i++) {
+		for (j = j_start; j < j_end; j++) {
 		
-			// TODO only draw IF the tile will actually be on screen. maybe calculate i,j bounds to do that
 			draw_sprite_from_sheet(
 				sprite_sheet,
 				indices[i + j * indices_width],
