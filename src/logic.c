@@ -20,7 +20,7 @@ static int tile_indices[] = {
 
 void init() {
 
-	tiles = load_sprite_sheet("res/tilemap_template.png", 16, 16);
+	tiles = load_sprite_sheet("res/tiles.png", 16, 16);
     font = load_sprite_sheet("res/font.png", 6, 7);
 
 	convert_indices_to_9_tile(tile_indices, 4, 4);
