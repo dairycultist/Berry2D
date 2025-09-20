@@ -15,8 +15,8 @@ static int grid[] = {
 
 void init() {
 
-	test = load_sprite_sheet("res/tiles.png", 16, 16, 4);
-    font = load_sprite_sheet("res/font.png", 6, 7, 26);
+	test = load_sprite_sheet("res/tiles.png", 16, 16);
+    font = load_sprite_sheet("res/font.png", 6, 7);
 
 	set_clear_color(25, 25, 80);
 }
@@ -38,5 +38,5 @@ void process(unsigned long time, int input) {
     draw_sprite_from_sheet(test, (time / 8) % 4, x, y);
 
     draw_grid(test, grid, 4, 4, 20, 20);
-    draw_text(font, "YOU CAN DRAW TEXT\nINDIVIDUAL SPRITES\nSPRITES FROM SPRITE SHEETS THAT\nMAKE ANIMATION EASIER\nAND GRIDS OF SPRITES\n\nALSO USE ARROW KEYS TO MOVE\nZ IS CONFIRM\nX IS CANCEL\nC IS MENU", 100, 20);
+    draw_text(font, "AND GRIDS OF SPRITES\n\nALSO USE ARROW KEYS TO MOVE\nZ IS CONFIRM\nX IS CANCEL\nC IS MENU", 100, 20);
 }

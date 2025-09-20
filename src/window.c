@@ -155,15 +155,19 @@ void free_sprite(Sprite *sprite) {
 	free(sprite);
 }
 
-SpriteSheet *load_sprite_sheet(const char *path, int sprite_width, int sprite_height, int sprites_per_row) {
+SpriteSheet *load_sprite_sheet(const char *path, int sprite_width, int sprite_height) {
 
 	SpriteSheet *sprite_sheet = malloc(sizeof(SpriteSheet));
 
 	sprite_sheet->sdl_texture = IMG_LoadTexture(renderer, path);
 
+	// get the width to determine the number of sprites per row (rounding down)
+	int width;
+	SDL_QueryTexture(sprite_sheet->sdl_texture, NULL, NULL, &width, NULL);
+
 	sprite_sheet->sprite_w = sprite_width;
 	sprite_sheet->sprite_h = sprite_height;
-	sprite_sheet->sprites_per_row = sprites_per_row;
+	sprite_sheet->sprites_per_row = width / sprite_width;
 
 	return sprite_sheet;
 }
