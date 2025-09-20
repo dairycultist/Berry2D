@@ -43,6 +43,8 @@ typedef struct {
 } SpriteSheet;
 
 // rendering function prototypes
+void set_clear_color(unsigned char r, unsigned char g, unsigned char b);
+
 Sprite *load_sprite(const char *path);
 void draw_sprite(Sprite *sprite, int x, int y);
 void free_sprite(Sprite *sprite);

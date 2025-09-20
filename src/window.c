@@ -7,6 +7,8 @@ static SDL_Window *window;
 static SDL_Renderer *renderer;
 static SDL_Texture *screen_buffer;
 
+static unsigned char clear_r, clear_g, clear_b;
+
 int main() {
 
 	printf("Starting Berry2D\n");
@@ -99,15 +101,15 @@ int main() {
 			}
 		}
 
-		SDL_SetRenderDrawColor(renderer, 40, 40, 40, 255); 			// clear window to grey
+		SDL_SetRenderDrawColor(renderer, 40, 40, 40, 255); 					// clear window to grey
 		SDL_RenderClear(renderer);
-		SDL_SetRenderTarget(renderer, screen_buffer); 				// set render target to screen_buffer
-		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); 			// clear screen_buffer to black
+		SDL_SetRenderTarget(renderer, screen_buffer); 						// set render target to screen_buffer
+		SDL_SetRenderDrawColor(renderer, clear_r, clear_g, clear_b, 255); 	// clear screen_buffer to clear color (default black)
 		SDL_RenderClear(renderer);
-		process(time++, input); 									// let the programmer do logic/render stuff to screen_buffer
-		SDL_SetRenderTarget(renderer, NULL); 						// reset render target back to window
-		SDL_RenderCopy(renderer, screen_buffer, NULL, &letterbox); 	// render screen_buffer
-		SDL_RenderPresent(renderer); 								// present rendered content to screen
+		process(time++, input); 											// let the programmer do logic/render stuff to screen_buffer
+		SDL_SetRenderTarget(renderer, NULL); 								// reset render target back to window
+		SDL_RenderCopy(renderer, screen_buffer, NULL, &letterbox); 			// render screen_buffer
+		SDL_RenderPresent(renderer); 										// present rendered content to screen
 
 		SDL_Delay(1000 / 60);
 	}
@@ -122,6 +124,13 @@ int main() {
 /*
  * header function implementations
  */
+void set_clear_color(unsigned char r, unsigned char g, unsigned char b) {
+	
+	clear_r = r;
+	clear_g = g;
+	clear_b = b;
+}
+
 Sprite *load_sprite(const char *path) {
 
 	Sprite *sprite = malloc(sizeof(Sprite));

@@ -8,15 +8,17 @@ static int x = 30, y = 80;
 
 static int grid[] = {
     0, 1, 2, 3,
-    0, 2, 2, 2,
-    1, 1, 0, 0,
-    2, 3, 2, 3
+    4, 5, 6, 7,
+    8, 9, 10, 7,
+    7, 7, 7, 7
 };
 
 void init() {
 
-	test = load_sprite_sheet("test.png", 16, 16, 2);
-    font = load_sprite_sheet("font.png", 6, 7, 26);
+	test = load_sprite_sheet("res/tiles.png", 16, 16, 4);
+    font = load_sprite_sheet("res/font.png", 6, 7, 26);
+
+	set_clear_color(25, 25, 80);
 }
 
 void process(unsigned long time, int input) {
