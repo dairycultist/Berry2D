@@ -1,104 +1,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-
-#define TRUE 1
-#define FALSE 0
-
-// screen size
-#define WIDTH 320
-#define HEIGHT 200
-#define ASPECT_RATIO (WIDTH / (float) HEIGHT)
-
-// input bitwise operations
-#define JUST_CHANGED(key, input)    ((input) & (1 << (key - 1)))
-#define PRESSED(key, input)         ((input) & (1 << key))
-#define JUST_PRESSED(key, input)    (JUST_CHANGED(key, input) && PRESSED(key, input))
-#define RELEASED(key, input)        (!PRESSED(key, input))
-#define JUST_RELEASED(key, input)   (JUST_CHANGED(key, input) && !PRESSED(key, input))
-
-#define UP 15       // arrow keys
-#define DOWN 13
-#define LEFT 11
-#define RIGHT 9
-#define CONFIRM 7   // Z
-#define CANCEL 5    // X
-#define MENU 3      // C
-
-// rendering datatypes
-typedef struct {
-
-    void *sdl_texture;
-    int w;
-    int h;
-
-} Sprite;
-
-typedef struct {
-
-    void *sdl_texture;
-    int sprite_w;
-    int sprite_h;
-    int sprites_per_row;
-
-} SpriteSheet;
-
-Sprite *load_sprite(const char *path);
-void draw_sprite(Sprite *sprite, int x, int y);
-void free_sprite(Sprite *sprite);
-
-SpriteSheet *load_sprite_sheet(const char *path, int sprite_width, int sprite_height, int sprites_per_row);
-void draw_sprite_from_sheet(SpriteSheet *sprite_sheet, int index, int x, int y);
-void draw_grid(SpriteSheet *sprite_sheet, int *indices, int indices_width, int indices_height, int x, int y);
-void draw_text(SpriteSheet *sprite_sheet, char *text, int x, int y); // text sprite sheets should follow a specific format
-void free_sprite_sheet(SpriteSheet *sprite_sheet);
-
-
-
-
-
-static SpriteSheet *test;
-static SpriteSheet *font;
-
-static int x = 30, y = 80;
-
-static int grid[] = {
-    0, 1, 2, 3,
-    0, 2, 2, 2,
-    1, 1, 0, 0,
-    2, 3, 2, 3
-};
-
-void init() {
-
-	test = load_sprite_sheet("test.png", 16, 16, 2);
-    font = load_sprite_sheet("font.png", 6, 7, 26);
-}
-
-void process(unsigned long time, int input) {
-
-    if (PRESSED(UP, input))
-        y -= PRESSED(CONFIRM, input) ? 2 : 1;
-
-    if (PRESSED(DOWN, input))
-        y += PRESSED(CONFIRM, input) ? 2 : 1;
-
-    if (PRESSED(LEFT, input))
-        x -= PRESSED(CONFIRM, input) ? 2 : 1;
-
-    if (PRESSED(RIGHT, input))
-        x += PRESSED(CONFIRM, input) ? 2 : 1;
-
-    draw_sprite_from_sheet(test, (time / 8) % 4, x, y);
-
-    draw_grid(test, grid, 4, 4, 20, 20);
-    draw_text(font, "YOU CAN DRAW TEXT\nINDIVIDUAL SPRITES\nSPRITES FROM SPRITE SHEETS THAT\nMAKE ANIMATION EASIER\nAND GRIDS OF SPRITES\n\nALSO USE ARROW KEYS TO MOVE\nZ IS CONFIRM\nX IS CANCEL\nC IS MENU", 100, 20);
-}
-
-
-
-
-
-
+#include "window.h"
+#include "logic.h"
 
 static SDL_Window *window;
 static SDL_Renderer *renderer;
@@ -174,6 +77,7 @@ void draw_grid(SpriteSheet *sprite_sheet, int *indices, int indices_width, int i
 	}
 }
 
+// text sprite sheets follows a specific format
 void draw_text(SpriteSheet *sprite_sheet, char *text, int x, int y) {
 
 	int start_x = x;
@@ -271,26 +175,31 @@ int main() {
 				// first operation is changing 'pressed?' flag, second 'just changed?' flag (cleared on next frame)
 				#define GET_INPUT_FROM_KEYSTATE(pressed, key) ((pressed ? input | (1 << key) : input & ~(1 << key)) | (1 << (key - 1)))
 
-				if (event.key.keysym.scancode == SDL_SCANCODE_UP)
-					input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, UP);
-
-				if (event.key.keysym.scancode == SDL_SCANCODE_DOWN)
-					input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, DOWN);
-
-				if (event.key.keysym.scancode == SDL_SCANCODE_LEFT)
-					input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, LEFT);
-
-				if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT)
-					input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, RIGHT);
-
-				if (event.key.keysym.scancode == SDL_SCANCODE_Z)
-					input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, CONFIRM);
-
-				if (event.key.keysym.scancode == SDL_SCANCODE_X)
-					input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, CANCEL);
-
-				if (event.key.keysym.scancode == SDL_SCANCODE_C)
-					input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, MENU);
+				switch (event.key.keysym.scancode) {
+					case SDL_SCANCODE_UP:
+						input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, UP);
+						break;
+					case SDL_SCANCODE_DOWN:
+						input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, DOWN);
+						break;
+					case SDL_SCANCODE_LEFT:
+						input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, LEFT);
+						break;
+					case SDL_SCANCODE_RIGHT:
+						input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, RIGHT);
+						break;
+					case SDL_SCANCODE_Z:
+						input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, CONFIRM);
+						break;
+					case SDL_SCANCODE_X:
+						input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, CANCEL);
+						break;
+					case SDL_SCANCODE_C:
+						input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, MENU);
+						break;
+					default:
+						break;
+				}
 			}
 		}
 
