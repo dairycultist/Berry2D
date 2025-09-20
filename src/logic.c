@@ -23,7 +23,7 @@ void init() {
 	tiles = load_sprite_sheet("res/tiles.png", 16, 16);
     font = load_sprite_sheet("res/font.png", 6, 7);
 
-	convert_indices_to_9_tile(tile_indices, 4, 4);
+	connect_indices(tile_indices, 4, 4);
 
 	set_clear_color(25, 25, 80);
 }

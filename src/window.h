@@ -55,10 +55,8 @@ void draw_grid(SpriteSheet *sprite_sheet, int *indices, int indices_width, int i
 void draw_text(SpriteSheet *sprite_sheet, char *text, int x, int y);
 void free_sprite_sheet(SpriteSheet *sprite_sheet);
 
-// helper for converting a grid of (essentially boolean) ints to a grid of properly-connected tiles following the assumed format
-// all assume tile indices correspond to a properly formatted 8x8 tilemap (format is the same for all three, but will vary in how much of it is filled in)
-void convert_indices_to_9_tile(int *indices, int indices_width, int indices_height);
-// void convert_indices_to_16_tile(int *indices, int indices_width, int indices_height);
-// void convert_indices_to_47_tile(int *indices, int indices_width, int indices_height);
+// helper for converting a grid of (essentially boolean) ints to a grid of properly-connected tiles following the assumed 8x8 tilemap format
+void connect_index(int *indices, int indices_width, int indices_height, int x, int y);
+void connect_indices(int *indices, int indices_width, int indices_height);
 
 #endif
