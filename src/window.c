@@ -142,11 +142,11 @@ Sprite *load_sprite(const char *path) {
 	return sprite;
 }
 
-void draw_sprite(Sprite *sprite, int x, int y) {
+void draw_sprite(Sprite *sprite, int x, int y, bool flip) {
 
 	SDL_Rect texture_rect = { x, y, sprite->w, sprite->h };
 
-	SDL_RenderCopy(renderer, sprite->sdl_texture, NULL, &texture_rect);
+	SDL_RenderCopyEx(renderer, sprite->sdl_texture, NULL, &texture_rect, 0.0, NULL, flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 }
 
 void free_sprite(Sprite *sprite) {
@@ -172,7 +172,7 @@ SpriteSheet *load_sprite_sheet(const char *path, int sprite_width, int sprite_he
 	return sprite_sheet;
 }
 
-void draw_sprite_from_sheet(SpriteSheet *sprite_sheet, int index, int x, int y) {
+void draw_sprite_from_sheet(SpriteSheet *sprite_sheet, int index, int x, int y, bool flip) {
 
 	SDL_Rect copy_rect = {
 
@@ -184,7 +184,7 @@ void draw_sprite_from_sheet(SpriteSheet *sprite_sheet, int index, int x, int y) 
 
 	SDL_Rect paste_rect = { x, y, sprite_sheet->sprite_w, sprite_sheet->sprite_h };
 
-	SDL_RenderCopy(renderer, sprite_sheet->sdl_texture, &copy_rect, &paste_rect);
+	SDL_RenderCopyEx(renderer, sprite_sheet->sdl_texture, &copy_rect, &paste_rect, 0.0, NULL, flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 }
 
 void draw_grid(SpriteSheet *sprite_sheet, int *indices, int indices_width, int indices_height, int x, int y) {
@@ -206,7 +206,8 @@ void draw_grid(SpriteSheet *sprite_sheet, int *indices, int indices_width, int i
 				sprite_sheet,
 				indices[i + j * indices_width],
 				x + i * sprite_sheet->sprite_w,
-				y + j * sprite_sheet->sprite_h
+				y + j * sprite_sheet->sprite_h,
+				FALSE
 			);
 		}
 	}
@@ -221,7 +222,7 @@ void draw_text(SpriteSheet *sprite_sheet, char *text, int x, int y) {
 
 		if (*text >= 'A' && *text <= 'Z') {
 
-			draw_sprite_from_sheet(sprite_sheet, *text - 65, x, y);
+			draw_sprite_from_sheet(sprite_sheet, *text - 65, x, y, FALSE);
 			x += sprite_sheet->sprite_w;
 		}
 
