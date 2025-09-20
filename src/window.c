@@ -248,9 +248,8 @@ void free_sprite_sheet(SpriteSheet *sprite_sheet) {
 
 static int get_from_indices(int *indices, int indices_width, int indices_height, int x, int y) {
 
-	if (x < 0 || x >= indices_width || y < 0 || y >= indices_height) {
+	if (x < 0 || x >= indices_width || y < 0 || y >= indices_height)
 		return 0;
-	}
 
 	return indices[x + y * indices_width];
 }
