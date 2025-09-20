@@ -4,6 +4,8 @@
 static SpriteSheet *grid_sprites;
 static SpriteSheet *font;
 
+static int camera_x = 0;
+
 static float player_x = 50, player_y = 50;
 static float player_dx = 0, player_dy = 0;
 static unsigned long time_of_last_jump;
@@ -35,7 +37,10 @@ void init() {
 
 static int player_collides_when_at(int x, int y) {
 
-	if (x < 0 || x >= LEVEL_WIDTH * 16 || y < 0 || y >= LEVEL_HEIGHT * 16)
+	if (x < 0 || x >= LEVEL_WIDTH * 16)
+		return 1;
+
+	if (y < 0 || y >= LEVEL_HEIGHT * 16)
 		return 0;
 
 	return sprite_indices[x / 16 + y / 16 * LEVEL_WIDTH]
@@ -66,19 +71,24 @@ void process(unsigned long time, int input) {
 
 	// move player w/ collision
 	while (player_collides_when_at(player_x + player_dx, player_y)) {
-		player_dx /= 2;
+		player_dx *= 0.7;
 	}
 	player_x += player_dx;
 
 	while (player_collides_when_at(player_x, player_y + player_dy)) {
-		player_dy /= 2;
+		player_dy *= 0.7;
 	}
 	player_y += player_dy;
 
-	// render
-	draw_grid(grid_sprites, sprite_indices, LEVEL_WIDTH, LEVEL_HEIGHT, 0, 0);
+	// update camera
+	while (WIDTH / 2 - ((int) player_x + 8) + camera_x <= 0) {
+		camera_x++;
+	}
 
-	draw_sprite_from_sheet(grid_sprites, 32, (int) player_x, (int) player_y);
+	// render
+	draw_grid(grid_sprites, sprite_indices, LEVEL_WIDTH, LEVEL_HEIGHT, -camera_x, 0);
+
+	draw_sprite_from_sheet(grid_sprites, 32, (int) player_x - camera_x, (int) player_y);
 
     draw_text(font, "ARROW KEYS TO MOVE\nZ IS CONFIRM\nX IS CANCEL\nC IS MENU", 100, 20);
 }
