@@ -10,6 +10,9 @@ static int camera_x = 0;
 static float player_x = 50, player_y = 50;
 static float player_dx = 0, player_dy = 0;
 
+static bool flipped = FALSE;
+static float run_cycle_timer;
+
 static unsigned long time_of_last_jump;
 static unsigned long time_of_last_pressed_jump;
 static unsigned long time_of_last_grounded;
@@ -95,11 +98,17 @@ void process(unsigned long time, int input) {
 	}
 
 	// running
-    if (PRESSED(LEFT, input) && !PRESSED(RIGHT, input))
+    if (PRESSED(LEFT, input) && !PRESSED(RIGHT, input)) {
+
         player_dx = player_dx * SLIPPERINESS - MAX_RUN_SPEED * (1.0 - SLIPPERINESS);
-    else if (PRESSED(RIGHT, input) && !PRESSED(LEFT, input))
+		flipped = TRUE;
+
+	} else if (PRESSED(RIGHT, input) && !PRESSED(LEFT, input)) {
+
         player_dx = player_dx * SLIPPERINESS + MAX_RUN_SPEED * (1.0 - SLIPPERINESS);
-	else
+		flipped = FALSE;
+
+	} else
 		player_dx *= SLIPPERINESS;
 
 	// move player w/ collision
@@ -121,12 +130,22 @@ void process(unsigned long time, int input) {
 	// render
 	draw_grid(grid_sprites, sprite_indices, LEVEL_WIDTH, LEVEL_HEIGHT, -camera_x, 0);
 
+	if (ABS(player_dx) < 0.3) {
+		run_cycle_timer = 0.0;
+	} else {
+		run_cycle_timer += (ABS(player_dx) + 1) / 20;
+		
+		if (run_cycle_timer >= 4.0) {
+			run_cycle_timer -= 4.0;
+		}
+	}
+
 	draw_sprite_from_sheet(
 		player_sprite,
-		ABS(player_dx) < 0.3 ? 0 : 1 + ((time * ((int) ABS(player_dx) + 1) / 20) % 2),
+		run_cycle_timer < 3.0 ? 1 + (int) run_cycle_timer : 2,
 		(int) player_x - camera_x,
 		(int) player_y,
-		player_dx < 0
+		flipped
 	);
 
     draw_text(font, "ARROW KEYS TO MOVE\nZ IS CONFIRM\nX IS CANCEL\nC IS MENU", 100, 20);
