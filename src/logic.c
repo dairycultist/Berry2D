@@ -16,6 +16,8 @@ static unsigned long time_of_last_jump;
 #define LEVEL_WIDTH 400
 #define LEVEL_HEIGHT 13
 
+#define ABS(x) ((x) > 0 ? (x) : -(x))
+
 static int sprite_indices[LEVEL_WIDTH * LEVEL_HEIGHT];
 
 void init() {
@@ -26,7 +28,7 @@ void init() {
 	for (int x = 0; x < LEVEL_WIDTH; x++) {
 		for (int y = 7; y < LEVEL_HEIGHT; y++) {
 
-			sprite_indices[x + y * LEVEL_WIDTH] = y > 10 ? 1 : 1 - ((x / 3) % 2);
+			sprite_indices[x + y * LEVEL_WIDTH] = y > 9 ? 1 : 1 - ((x / 3) % 2);
 		}
 	}
 
@@ -58,8 +60,18 @@ void process(unsigned long time, int input) {
 		time_of_last_jump = time;
 	}
 
-	// gravity (less if 1. holding jump and 2. recently jumped)
-	player_dy += (time - time_of_last_jump) < 20 && PRESSED(UP, input) ? 0.04 : 0.08;
+	// gravity (if recently jumped, make gravity lesser if holding jump, otherwise greater)
+	// ("recently jumped" is longer the faster you're running)
+	if ((time - time_of_last_jump) < 12 + ABS(player_dx) * 4) {
+
+		if (PRESSED(UP, input)) {
+			player_dy += 0.04;
+		} else {
+			player_dy += 0.25;
+		}
+	} else {
+		player_dy += 0.15;
+	}
 
 	// running
     if (PRESSED(LEFT, input) && !PRESSED(RIGHT, input))
