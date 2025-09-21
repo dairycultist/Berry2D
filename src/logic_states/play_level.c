@@ -6,14 +6,14 @@ static SpriteSheet *font;
 
 static int camera_x = 0;
 
-static float player_x = 50, player_y = 50;
+static float player_x = 40, player_y = 148;
 static float player_dx = 0, player_dy = 0;
 
 static bool flipped = FALSE;
 static float run_cycle_timer;
 
+static unsigned long time_of_last_pressed_jump = -100000; // game starts at time=0, if this starts at 0 then we will jump at game start
 static unsigned long time_of_last_jump;
-static unsigned long time_of_last_pressed_jump;
 static unsigned long time_of_last_grounded;
 static bool collided_horizontally;
 
@@ -142,8 +142,8 @@ void process_level(unsigned long time, int input) {
 
 	// respawn if fell out of level
 	if (player_y > 16 * LEVEL_HEIGHT) {
-		player_x = 50;
-		player_y = 50;
+		player_x = 40;
+		player_y = 148;
 	}
 
 	// update camera
