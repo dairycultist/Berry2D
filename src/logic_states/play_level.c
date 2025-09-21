@@ -28,10 +28,13 @@ static SpriteMap *level;
 
 void init_level() {
 
+	// obvious stuff
 	player_sprite = load_sprite_sheet("res/char.png", 16, 32);
     font = load_sprite_sheet("res/font.png", 6, 7);
+	set_clear_color(100, 180, 255);
 
-	int level_init_data[LEVEL_WIDTH * LEVEL_HEIGHT];
+	// initialize SpriteMap representing the level
+	int level_init_data[LEVEL_WIDTH * LEVEL_HEIGHT] = {};
 
 	for (int x = 0; x < LEVEL_WIDTH; x++) {
 		for (int y = 7; y < LEVEL_HEIGHT; y++) {
@@ -44,9 +47,7 @@ void init_level() {
 
 	sprite_sheets[0] = load_sprite_sheet("res/tiles.png", 16, 16);
 
-	level = load_sprite_map(sprite_sheets, LEVEL_WIDTH, LEVEL_HEIGHT, level_init_data);
-
-	set_clear_color(100, 180, 255);
+	level = load_sprite_map(sprite_sheets, 1, LEVEL_WIDTH, LEVEL_HEIGHT, level_init_data);
 }
 
 static int aabb_collides(int w, int h, int x, int y) {
@@ -54,16 +55,18 @@ static int aabb_collides(int w, int h, int x, int y) {
 	w--;
 	h--;
 
-	if (x < 0 || x + w >= LEVEL_WIDTH * 16)
+	if (x < 0 || x + w >= level->map_width * 16)
 		return 1;
 
-	if (y < 0 || y + h >= LEVEL_HEIGHT * 16)
-		return 0;
+	if (y < 0 || y + h >= level->map_height * 16)
+		return 1; // 0
 
-	return level->map[x / 16 + y / 16 * LEVEL_WIDTH]
-		|| level->map[(x + w) / 16 + y / 16 * LEVEL_WIDTH]
-		|| level->map[x / 16 + (y + h) / 16 * LEVEL_WIDTH]
-		|| level->map[(x + w) / 16 + (y + h) / 16 * LEVEL_WIDTH];
+	return 0;
+
+	// return level->map[x / 16 + y / 16 * level->map_width]
+	// 	|| level->map[(x + w) / 16 + y / 16 * level->map_width]
+	// 	|| level->map[x / 16 + (y + h) / 16 * level->map_width]
+	// 	|| level->map[(x + w) / 16 + (y + h) / 16 * level->map_width];
 }
 
 void process_level(unsigned long time, int input) {

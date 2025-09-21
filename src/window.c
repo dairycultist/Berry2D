@@ -186,32 +186,6 @@ void draw_sprite_from_sheet(SpriteSheet *sprite_sheet, int index, int x, int y, 
 	SDL_RenderCopyEx(renderer, sprite_sheet->sdl_texture, &copy_rect, &paste_rect, 0.0, NULL, flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 }
 
-void draw_grid(SpriteSheet *sprite_sheet, int *indices, int indices_width, int indices_height, int x, int y) {
-
-	int i, j;
-
-	// calculate bounds of indices array that will actually be on screen
-	int i_start = x >= 0 ? 0 : -x / sprite_sheet->sprite_w;
-	int j_start = y >= 0 ? 0 : -y / sprite_sheet->sprite_h;
-
-	int i_end = WIDTH >= (indices_width + 1) * sprite_sheet->sprite_w + x ? indices_width : indices_width + (WIDTH - indices_width * sprite_sheet->sprite_w - x) / sprite_sheet->sprite_w;
-	int j_end = HEIGHT >= (indices_height + 1) * sprite_sheet->sprite_h + y ? indices_height : indices_height + (HEIGHT - indices_height * sprite_sheet->sprite_h - y) / sprite_sheet->sprite_h;
-
-	// draw
-	for (i = i_start; i < i_end; i++) {
-		for (j = j_start; j < j_end; j++) {
-		
-			draw_sprite_from_sheet(
-				sprite_sheet,
-				indices[i + j * indices_width],
-				x + i * sprite_sheet->sprite_w,
-				y + j * sprite_sheet->sprite_h,
-				FALSE
-			);
-		}
-	}
-}
-
 // text sprite sheets follows a specific format
 void draw_text(SpriteSheet *sprite_sheet, char *text, int x, int y) {
 
@@ -246,73 +220,127 @@ void free_sprite_sheet(SpriteSheet *sprite_sheet) {
 	free(sprite_sheet);
 }
 
-static int get_from_indices(int *indices, int indices_width, int indices_height, int x, int y) {
+// helpers for converting a grid of (essentially boolean) ints to a grid of properly-connected tiles following the assumed 8x8 tilemap format
+static int get_from_indexer(int *indexer, int indexer_width, int indexer_height, int x, int y) {
 
-	if (x < 0 || x >= indices_width || y < 0 || y >= indices_height)
+	if (x < 0 || x >= indexer_width || y < 0 || y >= indexer_height)
 		return 0;
 
-	return indices[x + y * indices_width];
+	return indexer[x + y * indexer_width];
 }
 
-// helpers for converting a grid of (essentially boolean) ints to a grid of properly-connected tiles following the assumed 8x8 tilemap format
-static inline void connect_index(int *indices, int indices_width, int indices_height, int x, int y) {
+static inline void connect_index(int *indexer, int indexer_width, int indexer_height, int x, int y) {
 
 	// 9, 16, 47 tile, currently 9
 	int up, down, left, right;
 
-	if (indices[x + y * indices_width] == 0)
+	if (indexer[x + y * indexer_width] == 0)
 		return;
 
-	up = get_from_indices(indices, indices_width, indices_height, x, y - 1);
-	down = get_from_indices(indices, indices_width, indices_height, x, y + 1);
-	left = get_from_indices(indices, indices_width, indices_height, x - 1, y);
-	right = get_from_indices(indices, indices_width, indices_height, x + 1, y);
+	up = get_from_indexer(indexer, indexer_width, indexer_height, x, y - 1);
+	down = get_from_indexer(indexer, indexer_width, indexer_height, x, y + 1);
+	left = get_from_indexer(indexer, indexer_width, indexer_height, x - 1, y);
+	right = get_from_indexer(indexer, indexer_width, indexer_height, x + 1, y);
 
 	if (!up) {
 		if (!left) {
-			indices[x + y * indices_width] = 9;
+			indexer[x + y * indexer_width] = 9;
 		} else if (!right) {
-			indices[x + y * indices_width] = 11;
+			indexer[x + y * indexer_width] = 11;
 		} else {
-			indices[x + y * indices_width] = 10;
+			indexer[x + y * indexer_width] = 10;
 		}
 	} else if (!down) {
 		if (!left) {
-			indices[x + y * indices_width] = 25;
+			indexer[x + y * indexer_width] = 25;
 		} else if (!right) {
-			indices[x + y * indices_width] = 27;
+			indexer[x + y * indexer_width] = 27;
 		} else {
-			indices[x + y * indices_width] = 26;
+			indexer[x + y * indexer_width] = 26;
 		}
 	} else {
 		if (!left) {
-			indices[x + y * indices_width] = 17;
+			indexer[x + y * indexer_width] = 17;
 		} else if (!right) {
-			indices[x + y * indices_width] = 19;
+			indexer[x + y * indexer_width] = 19;
 		} else {
-			indices[x + y * indices_width] = 18;
+			indexer[x + y * indexer_width] = 18;
 		}
 	}
 }
 
-static void connect_indices(int *indices, int indices_width, int indices_height) {
+SpriteMap *load_sprite_map(SpriteSheet **sprite_sheets, int sprite_sheet_count, int map_width, int map_height, int *map) {
 
-	for (int x = 0; x < indices_width; x++) {
-		for (int y = 0; y < indices_height; y++) {
+	SpriteMap *sprite_map = malloc(sizeof(SpriteMap));
 
-			connect_index(indices, indices_width, indices_height, x, y);
+	sprite_map->sprite_sheet_count = sprite_sheet_count;
+	sprite_map->sprite_sheets = sprite_sheets;
+	sprite_map->sprite_indexers = malloc(sizeof(int *) * sprite_sheet_count);
+
+	sprite_map->map_width = map_width;
+	sprite_map->map_height = map_height;
+	sprite_map->map = map;
+
+	for (int sprite_sheet = 0; sprite_sheet < sprite_sheet_count; sprite_sheet++) {
+
+		// create an array of indexers for this sprite sheet the size of the map
+		sprite_map->sprite_indexers[sprite_sheet] = malloc(sizeof(int) * map_width * map_height);
+
+		// initialize it with TRUE for every value in map that matches sprite_sheet
+		for (int i = 0; i < map_width * map_height; i++) {
+
+				sprite_map->sprite_indexers[sprite_sheet][i] = map[i] == sprite_sheet + 1;
+		}
+
+		// modify the sprite indexer to go from binary TRUE/FALSE to properly indexing the sprite sheet to be connected
+		for (int x = 0; x < map_width; x++) {
+			for (int y = 0; y < map_height; y++) {
+
+				connect_index(sprite_map->sprite_indexers[sprite_sheet], map_width, map_height, x, y);
+			}
+		}
+	}
+
+	return sprite_map;
+}
+
+void draw_sprite_map(SpriteMap *sprite_map, int x, int y) {
+
+	// calculate bounds of indices array that will actually be on screen
+	int i_start = 0;//x >= 0 ? 0 : -x / sprite_map->sprite_sheets[0]->sprite_w;
+	int j_start = 0;//y >= 0 ? 0 : -y / sprite_map->sprite_sheets[0]->sprite_h;
+
+	int i_end = sprite_map->map_width;//WIDTH >= (indices_width + 1) * sprite_sheet->sprite_w + x ? indices_width : indices_width + (WIDTH - indices_width * sprite_sheet->sprite_w - x) / sprite_sheet->sprite_w;
+	int j_end = sprite_map->map_height;//HEIGHT >= (indices_height + 1) * sprite_sheet->sprite_h + y ? indices_height : indices_height + (HEIGHT - indices_height * sprite_sheet->sprite_h - y) / sprite_sheet->sprite_h;
+
+	// draw
+	for (int i = i_start; i < i_end; i++) {
+		for (int j = j_start; j < j_end; j++) {
+
+			int sprite_sheet = 0;//sprite_map->map[i + j * sprite_map->map_width];
+		
+			draw_sprite_from_sheet(
+				sprite_map->sprite_sheets[sprite_sheet],
+				sprite_map->sprite_indexers[sprite_sheet][i + j * sprite_map->map_width],
+				x + i * sprite_map->sprite_sheets[sprite_sheet]->sprite_w,
+				y + j * sprite_map->sprite_sheets[sprite_sheet]->sprite_h,
+				FALSE
+			);
 		}
 	}
 }
 
-SpriteMap *load_sprite_map(SpriteSheet **sprite_sheets, int map_width, int map_height, int *map) {
+void free_sprite_map(SpriteMap *sprite_map) {
 
-}
+	// note this doesn't free attached sprite_sheets
 
-void draw_sprite_map(SpriteMap *map, int x, int y) {
+	// free all array entries in sprite_indexers
+	for (int i = 0; i < sprite_map->sprite_sheet_count; i++)
+		free(sprite_map->sprite_indexers[i]);
 
-}
+	// free sprite_indexers itself
+	free(sprite_map->sprite_indexers);
 
-void free_sprite_map(SpriteMap *map) {
-	
+	// free the spritemap
+	free(sprite_map);
 }

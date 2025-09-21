@@ -57,18 +57,21 @@ void free_sprite_sheet(SpriteSheet *sprite_sheet);
 
 typedef struct {
 
-		SpriteSheet **sprite_sheets;
-		int **sprite_indices;
+	// these variable names gotta change lol they're not very transparent
 
-		int map_width;
-		int map_height;
-		int *map; // indexes into sprite_sheets and sprite_indices to determine what sprite to place
+	int sprite_sheet_count;
+	SpriteSheet **sprite_sheets; // need to have sprites that are the same size, or else undefined behaviour
+	int **sprite_indexers; // determines what sprite within a sprite sheet to use (each array shares an index with the sprite sheet it indexes into)
+
+	int map_width;
+	int map_height;
+	int *map; // determines what sprite sheet to use (each value indexes into sprite_sheets and sprite_indices)
 
 } SpriteMap;
 
-SpriteMap *load_sprite_map(SpriteSheet **sprite_sheets, int map_width, int map_height, int *map);
-void draw_sprite_map(SpriteMap *map, int x, int y);
-void free_sprite_map(SpriteMap *map);
+SpriteMap *load_sprite_map(SpriteSheet **sprite_sheets, int sprite_sheet_count, int map_width, int map_height, int *map);
+void draw_sprite_map(SpriteMap *sprite_map, int x, int y);
+void free_sprite_map(SpriteMap *sprite_map);
 
 // implemented in logic.c
 void init();
