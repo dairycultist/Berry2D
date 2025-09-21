@@ -269,19 +269,22 @@ static inline void smooth_at_point_in_indexer(int *indexer, int indexer_width, i
 	}
 }
 
-void update_sprite_map_layer(SpriteMap *sprite_map, int layer_to_update) {
+void flush_sprite_map(SpriteMap *sprite_map) {
 
-	// modify the sprite indexer to have TRUE only for values in map that match layer_to_update
-	for (int i = 0; i < sprite_map->map_width * sprite_map->map_height; i++) {
+	for (int layer_index = 0; layer_index < sprite_map->layer_count; layer_index++) {
 
-		sprite_map->layers[layer_to_update - 1][i] = sprite_map->map[i] == layer_to_update;
-	}
+		// modify the sprite indexer to have TRUE only for values in map that match layer_index
+		for (int i = 0; i < sprite_map->map_width * sprite_map->map_height; i++) {
 
-	// modify the sprite indexer to go from binary TRUE/FALSE to properly indexing the sprite sheet to smoothly connect
-	for (int x = 0; x < sprite_map->map_width; x++) {
-		for (int y = 0; y < sprite_map->map_height; y++) {
+			sprite_map->layers[layer_index][i] = sprite_map->map[i] == layer_index + 1;
+		}
 
-			smooth_at_point_in_indexer(sprite_map->layers[layer_to_update - 1], sprite_map->map_width, sprite_map->map_height, x, y);
+		// modify the sprite indexer to go from binary TRUE/FALSE to properly indexing the sprite sheet to smoothly connect
+		for (int x = 0; x < sprite_map->map_width; x++) {
+			for (int y = 0; y < sprite_map->map_height; y++) {
+
+				smooth_at_point_in_indexer(sprite_map->layers[layer_index], sprite_map->map_width, sprite_map->map_height, x, y);
+			}
 		}
 	}
 }

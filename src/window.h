@@ -69,8 +69,10 @@ typedef struct {
 
 SpriteMap *load_sprite_map(SpriteSheet **sprite_sheets, int layer_count, int map_width, int map_height);
 void draw_sprite_map(SpriteMap *sprite_map, int x, int y);
-void update_sprite_map_layer(SpriteMap *sprite_map, int layer_to_update);
+void flush_sprite_map(SpriteMap *sprite_map); // if you update ->map, you need to flush the changes so they're reflected in the layers (which determine what's drawn)
 void free_sprite_map(SpriteMap *sprite_map);
+// maybe add a "set_in_sprite_map" that will automatically flush the relevant layers, and only around the set position, if you
+// don't want to update ->map and then flush
 
 // implemented in logic.c
 void init();

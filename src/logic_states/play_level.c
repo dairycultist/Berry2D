@@ -48,8 +48,7 @@ void init_level() {
 		}
 	}
 
-	update_sprite_map_layer(level, 1);
-	update_sprite_map_layer(level, 2);
+	flush_sprite_map(level);
 }
 
 static int aabb_collides(int w, int h, int x, int y) {
