@@ -289,7 +289,7 @@ SpriteMap *load_sprite_map(SpriteSheet **sprite_sheets, int sprite_sheet_count, 
 		// initialize it with TRUE for every value in map that matches sprite_sheet
 		for (int i = 0; i < map_width * map_height; i++) {
 
-				sprite_map->sprite_indexers[sprite_sheet][i] = map[i] == sprite_sheet + 1;
+			sprite_map->sprite_indexers[sprite_sheet][i] = map[i] == sprite_sheet + 1;
 		}
 
 		// modify the sprite indexer to go from binary TRUE/FALSE to properly indexing the sprite sheet to be connected
@@ -307,17 +307,22 @@ SpriteMap *load_sprite_map(SpriteSheet **sprite_sheets, int sprite_sheet_count, 
 void draw_sprite_map(SpriteMap *sprite_map, int x, int y) {
 
 	// calculate bounds of indices array that will actually be on screen
-	int i_start = 0;//x >= 0 ? 0 : -x / sprite_map->sprite_sheets[0]->sprite_w;
-	int j_start = 0;//y >= 0 ? 0 : -y / sprite_map->sprite_sheets[0]->sprite_h;
+	int i_start = x >= 0 ? 0 : -x / sprite_map->sprite_sheets[0]->sprite_w;
+	int j_start = y >= 0 ? 0 : -y / sprite_map->sprite_sheets[0]->sprite_h;
 
-	int i_end = sprite_map->map_width;//WIDTH >= (indices_width + 1) * sprite_sheet->sprite_w + x ? indices_width : indices_width + (WIDTH - indices_width * sprite_sheet->sprite_w - x) / sprite_sheet->sprite_w;
-	int j_end = sprite_map->map_height;//HEIGHT >= (indices_height + 1) * sprite_sheet->sprite_h + y ? indices_height : indices_height + (HEIGHT - indices_height * sprite_sheet->sprite_h - y) / sprite_sheet->sprite_h;
+	int i_end = WIDTH >= (sprite_map->map_width + 1) * sprite_map->sprite_sheets[0]->sprite_w + x ? sprite_map->map_width : sprite_map->map_width + (WIDTH - sprite_map->map_width * sprite_map->sprite_sheets[0]->sprite_w - x) / sprite_map->sprite_sheets[0]->sprite_w;
+	int j_end = HEIGHT >= (sprite_map->map_height + 1) * sprite_map->sprite_sheets[0]->sprite_h + y ? sprite_map->map_height : sprite_map->map_height + (HEIGHT - sprite_map->map_height * sprite_map->sprite_sheets[0]->sprite_h - y) / sprite_map->sprite_sheets[0]->sprite_h;
 
 	// draw
 	for (int i = i_start; i < i_end; i++) {
 		for (int j = j_start; j < j_end; j++) {
 
-			int sprite_sheet = 0;//sprite_map->map[i + j * sprite_map->map_width];
+			int sprite_sheet = sprite_map->map[i + j * sprite_map->map_width];
+
+			if (sprite_sheet == 0)
+				continue;
+
+			sprite_sheet--; // since sprite sheets are 1-indexed (0 is no render)
 		
 			draw_sprite_from_sheet(
 				sprite_map->sprite_sheets[sprite_sheet],

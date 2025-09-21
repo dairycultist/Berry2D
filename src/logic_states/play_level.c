@@ -34,20 +34,21 @@ void init_level() {
 	set_clear_color(100, 180, 255);
 
 	// initialize SpriteMap representing the level
-	int level_init_data[LEVEL_WIDTH * LEVEL_HEIGHT] = {};
+	int *level_init_data = calloc(sizeof(int) * LEVEL_WIDTH * LEVEL_HEIGHT, 1);
 
 	for (int x = 0; x < LEVEL_WIDTH; x++) {
 		for (int y = 7; y < LEVEL_HEIGHT; y++) {
 
-			level_init_data[x + y * LEVEL_WIDTH] = y > 10 ? 1 : ((x / 6 + 1) % 3 % 2);
+			level_init_data[x + y * LEVEL_WIDTH] = y > 10 ? 1 : ((x / 6) % 3);
 		}
 	}
 
-	SpriteSheet **sprite_sheets = malloc(sizeof(SpriteSheet *));
+	SpriteSheet **sprite_sheets = malloc(sizeof(SpriteSheet *) * 2);
 
-	sprite_sheets[0] = load_sprite_sheet("res/tiles.png", 16, 16);
+	sprite_sheets[0] = load_sprite_sheet("res/ground.png", 16, 16);
+	sprite_sheets[1] = load_sprite_sheet("res/spritemap_template.png", 16, 16);
 
-	level = load_sprite_map(sprite_sheets, 1, LEVEL_WIDTH, LEVEL_HEIGHT, level_init_data);
+	level = load_sprite_map(sprite_sheets, 2, LEVEL_WIDTH, LEVEL_HEIGHT, level_init_data);
 }
 
 static int aabb_collides(int w, int h, int x, int y) {
@@ -141,7 +142,7 @@ void process_level(unsigned long time, int input) {
 
 void draw_level(unsigned long time, int input) {
 
-	// render level
+	// draw level sprite map
 	draw_sprite_map(level, -camera_x, 0);
 
 	// render player (determine animation too)
