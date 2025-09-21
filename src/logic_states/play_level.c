@@ -1,5 +1,6 @@
+#import <stdlib.h>
+
 static SpriteSheet *player_sprite;
-static SpriteSheet *grid_sprites;
 static SpriteSheet *font;
 
 static int camera_x = 0;
@@ -23,22 +24,27 @@ static bool collided_horizontally;
 
 #define ABS(x) ((x) > 0 ? (x) : -(x))
 
-static int sprite_indices[LEVEL_WIDTH * LEVEL_HEIGHT]; // TODO tile type grid that generates multiple tile (texture) indices grids (one for each type)
+static SpriteMap *level;
 
 void init_level() {
 
 	player_sprite = load_sprite_sheet("res/char.png", 16, 32);
-	grid_sprites = load_sprite_sheet("res/tiles.png", 16, 16);
     font = load_sprite_sheet("res/font.png", 6, 7);
+
+	int level_init_data[LEVEL_WIDTH * LEVEL_HEIGHT];
 
 	for (int x = 0; x < LEVEL_WIDTH; x++) {
 		for (int y = 7; y < LEVEL_HEIGHT; y++) {
 
-			sprite_indices[x + y * LEVEL_WIDTH] = y > 10 ? 1 : ((x / 6 + 1) % 3 % 2);
+			level_init_data[x + y * LEVEL_WIDTH] = y > 10 ? 1 : ((x / 6 + 1) % 3 % 2);
 		}
 	}
 
-	connect_indices(sprite_indices, LEVEL_WIDTH, LEVEL_HEIGHT);
+	SpriteSheet **sprite_sheets = malloc(sizeof(SpriteSheet *));
+
+	sprite_sheets[0] = load_sprite_sheet("res/tiles.png", 16, 16);
+
+	level = load_sprite_map(sprite_sheets, LEVEL_WIDTH, LEVEL_HEIGHT, level_init_data);
 
 	set_clear_color(100, 180, 255);
 }
@@ -54,10 +60,10 @@ static int aabb_collides(int w, int h, int x, int y) {
 	if (y < 0 || y + h >= LEVEL_HEIGHT * 16)
 		return 0;
 
-	return sprite_indices[x / 16 + y / 16 * LEVEL_WIDTH]
-		|| sprite_indices[(x + w) / 16 + y / 16 * LEVEL_WIDTH]
-		|| sprite_indices[x / 16 + (y + h) / 16 * LEVEL_WIDTH]
-		|| sprite_indices[(x + w) / 16 + (y + h) / 16 * LEVEL_WIDTH];
+	return level->map[x / 16 + y / 16 * LEVEL_WIDTH]
+		|| level->map[(x + w) / 16 + y / 16 * LEVEL_WIDTH]
+		|| level->map[x / 16 + (y + h) / 16 * LEVEL_WIDTH]
+		|| level->map[(x + w) / 16 + (y + h) / 16 * LEVEL_WIDTH];
 }
 
 void process_level(unsigned long time, int input) {
@@ -132,8 +138,8 @@ void process_level(unsigned long time, int input) {
 
 void draw_level(unsigned long time, int input) {
 
-	// render grid
-	draw_grid(grid_sprites, sprite_indices, LEVEL_WIDTH, LEVEL_HEIGHT, -camera_x, 0);
+	// render level
+	draw_sprite_map(level, -camera_x, 0);
 
 	// render player (determine animation too)
 	int player_sprite_index = 0;

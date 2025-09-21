@@ -254,7 +254,8 @@ static int get_from_indices(int *indices, int indices_width, int indices_height,
 	return indices[x + y * indices_width];
 }
 
-inline void connect_index(int *indices, int indices_width, int indices_height, int x, int y) {
+// helpers for converting a grid of (essentially boolean) ints to a grid of properly-connected tiles following the assumed 8x8 tilemap format
+static inline void connect_index(int *indices, int indices_width, int indices_height, int x, int y) {
 
 	// 9, 16, 47 tile, currently 9
 	int up, down, left, right;
@@ -294,7 +295,7 @@ inline void connect_index(int *indices, int indices_width, int indices_height, i
 	}
 }
 
-void connect_indices(int *indices, int indices_width, int indices_height) {
+static void connect_indices(int *indices, int indices_width, int indices_height) {
 
 	for (int x = 0; x < indices_width; x++) {
 		for (int y = 0; y < indices_height; y++) {
@@ -302,4 +303,16 @@ void connect_indices(int *indices, int indices_width, int indices_height) {
 			connect_index(indices, indices_width, indices_height, x, y);
 		}
 	}
+}
+
+SpriteMap *load_sprite_map(SpriteSheet **sprite_sheets, int map_width, int map_height, int *map) {
+
+}
+
+void draw_sprite_map(SpriteMap *map, int x, int y) {
+
+}
+
+void free_sprite_map(SpriteMap *map) {
+	
 }

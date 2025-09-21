@@ -26,7 +26,9 @@ typedef int bool;
 #define CANCEL 5    // X
 #define MENU 3      // C
 
-// rendering datatypes
+// rendering datatypes and function prototypes
+void set_clear_color(unsigned char r, unsigned char g, unsigned char b);
+
 typedef struct {
 
     void *sdl_texture;
@@ -34,6 +36,10 @@ typedef struct {
     int h;
 
 } Sprite;
+
+Sprite *load_sprite(const char *path);
+void draw_sprite(Sprite *sprite, int x, int y, bool flip);
+void free_sprite(Sprite *sprite);
 
 typedef struct {
 
@@ -44,22 +50,25 @@ typedef struct {
 
 } SpriteSheet;
 
-// rendering function prototypes
-void set_clear_color(unsigned char r, unsigned char g, unsigned char b);
-
-Sprite *load_sprite(const char *path);
-void draw_sprite(Sprite *sprite, int x, int y, bool flip);
-void free_sprite(Sprite *sprite);
-
 SpriteSheet *load_sprite_sheet(const char *path, int sprite_width, int sprite_height);
 void draw_sprite_from_sheet(SpriteSheet *sprite_sheet, int index, int x, int y, bool flip);
-void draw_grid(SpriteSheet *sprite_sheet, int *indices, int indices_width, int indices_height, int x, int y);
 void draw_text(SpriteSheet *sprite_sheet, char *text, int x, int y);
 void free_sprite_sheet(SpriteSheet *sprite_sheet);
 
-// helper for converting a grid of (essentially boolean) ints to a grid of properly-connected tiles following the assumed 8x8 tilemap format
-void connect_index(int *indices, int indices_width, int indices_height, int x, int y);
-void connect_indices(int *indices, int indices_width, int indices_height);
+typedef struct {
+
+		SpriteSheet **sprite_sheets;
+		int **sprite_indices;
+
+		int map_width;
+		int map_height;
+		int *map; // indexes into sprite_sheets and sprite_indices to determine what sprite to place
+
+} SpriteMap;
+
+SpriteMap *load_sprite_map(SpriteSheet **sprite_sheets, int map_width, int map_height, int *map);
+void draw_sprite_map(SpriteMap *map, int x, int y);
+void free_sprite_map(SpriteMap *map);
 
 // implemented in logic.c
 void init();
