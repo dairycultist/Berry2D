@@ -269,39 +269,39 @@ static inline void smooth_at_point_in_indexer(int *indexer, int indexer_width, i
 	}
 }
 
-void update_sprite_map(SpriteMap *sprite_map, int sprite_sheet_to_update) {
+void update_sprite_map_layer(SpriteMap *sprite_map, int layer_to_update) {
 
-	// modify the sprite indexer to have TRUE only for values in map that match sprite_sheet_to_update
+	// modify the sprite indexer to have TRUE only for values in map that match layer_to_update
 	for (int i = 0; i < sprite_map->map_width * sprite_map->map_height; i++) {
 
-		sprite_map->sprite_indexers[sprite_sheet_to_update - 1][i] = sprite_map->map[i] == sprite_sheet_to_update;
+		sprite_map->layers[layer_to_update - 1][i] = sprite_map->map[i] == layer_to_update;
 	}
 
 	// modify the sprite indexer to go from binary TRUE/FALSE to properly indexing the sprite sheet to smoothly connect
 	for (int x = 0; x < sprite_map->map_width; x++) {
 		for (int y = 0; y < sprite_map->map_height; y++) {
 
-			smooth_at_point_in_indexer(sprite_map->sprite_indexers[sprite_sheet_to_update - 1], sprite_map->map_width, sprite_map->map_height, x, y);
+			smooth_at_point_in_indexer(sprite_map->layers[layer_to_update - 1], sprite_map->map_width, sprite_map->map_height, x, y);
 		}
 	}
 }
 
-SpriteMap *load_sprite_map(SpriteSheet **sprite_sheets, int sprite_sheet_count, int map_width, int map_height) {
+SpriteMap *load_sprite_map(SpriteSheet **sprite_sheets, int layer_count, int map_width, int map_height) {
 
 	SpriteMap *sprite_map = malloc(sizeof(SpriteMap));
 
-	sprite_map->sprite_sheet_count = sprite_sheet_count;
+	sprite_map->layer_count = layer_count;
+	sprite_map->layers = malloc(sizeof(int *) * layer_count);
 	sprite_map->sprite_sheets = sprite_sheets;
-	sprite_map->sprite_indexers = malloc(sizeof(int *) * sprite_sheet_count);
 
 	sprite_map->map_width = map_width;
 	sprite_map->map_height = map_height;
 	sprite_map->map = calloc(map_width * map_height, sizeof(int));
 
-	for (int sprite_sheet = 0; sprite_sheet < sprite_sheet_count; sprite_sheet++) {
+	for (int layer_index = 0; layer_index < layer_count; layer_index++) {
 
-		// create an array of indexers for this sprite sheet the size of the map
-		sprite_map->sprite_indexers[sprite_sheet] = malloc(sizeof(int) * map_width * map_height);
+		// create a layer the size of the map
+		sprite_map->layers[layer_index] = malloc(sizeof(int) * map_width * map_height);
 	}
 
 	return sprite_map;
@@ -310,6 +310,7 @@ SpriteMap *load_sprite_map(SpriteSheet **sprite_sheets, int sprite_sheet_count, 
 void draw_sprite_map(SpriteMap *sprite_map, int x, int y) {
 
 	// calculate bounds of indices array that will actually be on screen
+	// this is unreadable but it works ok
 	int i_start = x >= 0 ? 0 : -x / sprite_map->sprite_sheets[0]->sprite_w;
 	int j_start = y >= 0 ? 0 : -y / sprite_map->sprite_sheets[0]->sprite_h;
 
@@ -320,18 +321,18 @@ void draw_sprite_map(SpriteMap *sprite_map, int x, int y) {
 	for (int i = i_start; i < i_end; i++) {
 		for (int j = j_start; j < j_end; j++) {
 
-			int sprite_sheet = sprite_map->map[i + j * sprite_map->map_width];
+			int layer_index = sprite_map->map[i + j * sprite_map->map_width];
 
-			if (sprite_sheet == 0)
+			if (layer_index == 0)
 				continue;
 
-			sprite_sheet--; // since sprite sheets are 1-indexed (0 is no render)
+			layer_index--; // since layers are 1-indexed (0 is no render)
 		
 			draw_sprite_from_sheet(
-				sprite_map->sprite_sheets[sprite_sheet],
-				sprite_map->sprite_indexers[sprite_sheet][i + j * sprite_map->map_width],
-				x + i * sprite_map->sprite_sheets[sprite_sheet]->sprite_w,
-				y + j * sprite_map->sprite_sheets[sprite_sheet]->sprite_h,
+				sprite_map->sprite_sheets[layer_index],
+				sprite_map->layers[layer_index][i + j * sprite_map->map_width],
+				x + i * sprite_map->sprite_sheets[layer_index]->sprite_w,
+				y + j * sprite_map->sprite_sheets[layer_index]->sprite_h,
 				FALSE
 			);
 		}
@@ -345,12 +346,11 @@ void free_sprite_map(SpriteMap *sprite_map) {
 	// free map
 	free(sprite_map->map);
 
-	// free all array entries in sprite_indexers
-	for (int i = 0; i < sprite_map->sprite_sheet_count; i++)
-		free(sprite_map->sprite_indexers[i]);
+	// free all layers + layer array
+	for (int i = 0; i < sprite_map->layer_count; i++)
+		free(sprite_map->layers[i]);
 
-	// free sprite_indexers itself
-	free(sprite_map->sprite_indexers);
+	free(sprite_map->layers);
 
 	// free the spritemap
 	free(sprite_map);

@@ -44,12 +44,12 @@ void init_level() {
 	for (int x = 0; x < LEVEL_WIDTH; x++) {
 		for (int y = 7; y < LEVEL_HEIGHT; y++) {
 
-			level->map[x + y * LEVEL_WIDTH] = y > 10 ? 1 : ((x / 6) % 3);
+			level->map[x + y * LEVEL_WIDTH] = y > 10 ? 1 : ((x / 8) % 3);
 		}
 	}
 
-	update_sprite_map(level, 1);
-	update_sprite_map(level, 2);
+	update_sprite_map_layer(level, 1);
+	update_sprite_map_layer(level, 2);
 }
 
 static int aabb_collides(int w, int h, int x, int y) {
