@@ -36,7 +36,7 @@ void init() {
 	for (int x = 0; x < LEVEL_WIDTH; x++) {
 		for (int y = 7; y < LEVEL_HEIGHT; y++) {
 
-			sprite_indices[x + y * LEVEL_WIDTH] = y > 9 ? 1 : 1 - ((x / 3) % 2);
+			sprite_indices[x + y * LEVEL_WIDTH] = y > 9 ? 1 : 1 - ((x / 3) % 3 % 2);
 		}
 	}
 
@@ -112,8 +112,11 @@ void process(unsigned long time, int input) {
 		player_dx *= SLIPPERINESS;
 
 	// move player w/ collision
+	bool collided_horizontally = FALSE;
+
 	while (aabb_collides(16, 32, player_x + player_dx, player_y)) {
 		player_dx *= 0.7;
+		collided_horizontally = TRUE;
 	}
 	player_x += player_dx;
 
@@ -138,7 +141,7 @@ void process(unsigned long time, int input) {
 		run_cycle_timer = 0.0;
 		player_sprite_index = 4;
 
-	} else if (ABS(player_dx) < 0.3) {
+	} else if ((ABS(player_dx) < 0.3 && !PRESSED(LEFT, input) && !PRESSED(RIGHT, input)) || collided_horizontally) {
 
 		run_cycle_timer = 0.0;
 		player_sprite_index = 0;
