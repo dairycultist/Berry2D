@@ -356,8 +356,6 @@ void draw_sprite_map(SpriteMap *sprite_map, int x, int y) {
 
 void free_sprite_map(SpriteMap *sprite_map) {
 
-	// TODO doesn't free attached sprite_sheets
-
 	// free map
 	free(sprite_map->map);
 
