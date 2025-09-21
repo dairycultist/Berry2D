@@ -1,3 +1,8 @@
+/*
+ * window is an abstraction layer that implements I/O (keyboard input, rendering, audio, etc) and will call
+ * two externally implemented functions (init and process) as appropriate
+ */
+
 #ifndef WINDOW_H
 #define WINDOW_H
 
