@@ -289,7 +289,7 @@ void flush_sprite_map(SpriteMap *sprite_map) {
 	}
 }
 
-SpriteMap *load_sprite_map(SpriteSheet **sprite_sheets, int layer_count, int map_width, int map_height) {
+SpriteMap *create_sprite_map(SpriteSheet **sprite_sheets, int layer_count, int map_width, int map_height) {
 
 	SpriteMap *sprite_map = malloc(sizeof(SpriteMap));
 

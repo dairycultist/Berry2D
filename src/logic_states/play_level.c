@@ -39,7 +39,7 @@ void init_level() {
 	sprite_sheets[0] = load_sprite_sheet("res/ground.png", 16, 16);
 	sprite_sheets[1] = load_sprite_sheet("res/spritemap_template.png", 16, 16);
 
-	level = load_sprite_map(sprite_sheets, 2, LEVEL_WIDTH, LEVEL_HEIGHT);
+	level = create_sprite_map(sprite_sheets, 2, LEVEL_WIDTH, LEVEL_HEIGHT);
 
 	for (int x = 0; x < LEVEL_WIDTH; x++) {
 		for (int y = 7; y < LEVEL_HEIGHT; y++) {

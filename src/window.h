@@ -67,7 +67,9 @@ typedef struct {
 
 } SpriteMap;
 
-SpriteMap *load_sprite_map(SpriteSheet **sprite_sheets, int layer_count, int map_width, int map_height);
+// 1. add sprite_width and sprite_height to create_sprite_map
+// 2. add add_layer_to_sprite_map(const char *sprite_sheet_path)
+SpriteMap *create_sprite_map(SpriteSheet **sprite_sheets, int layer_count, int map_width, int map_height);
 void draw_sprite_map(SpriteMap *sprite_map, int x, int y);
 void flush_sprite_map(SpriteMap *sprite_map); // if you update ->map, you need to flush the changes so they're reflected in the layers (which determine what's drawn)
 void free_sprite_map(SpriteMap *sprite_map);
