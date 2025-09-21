@@ -123,18 +123,26 @@ void process(unsigned long time, int input) {
 	player_y += player_dy;
 
 	// update camera
-	while (WIDTH / 2 - ((int) player_x + 8) + camera_x <= 0) {
-		camera_x++;
-	}
+	int player_middle_pos = WIDTH / 2 - ((int) player_x + 8);
+
+	while (player_middle_pos + camera_x >= 20 && camera_x > 0) { camera_x--; }
+	while (player_middle_pos + camera_x <= -20) { camera_x++; }
 
 	// render
 	draw_grid(grid_sprites, sprite_indices, LEVEL_WIDTH, LEVEL_HEIGHT, -camera_x, 0);
 
 	int player_sprite_index = 0;
 
-	if (ABS(player_dx) < 0.3) {
+	if (time_of_last_grounded != time) {
+
+		run_cycle_timer = 0.0;
+		player_sprite_index = 4;
+
+	} else if (ABS(player_dx) < 0.3) {
+
 		run_cycle_timer = 0.0;
 		player_sprite_index = 0;
+
 	} else {
 		run_cycle_timer += (ABS(player_dx) + 1) / 20;
 		
