@@ -36,7 +36,7 @@ void init() {
 	for (int x = 0; x < LEVEL_WIDTH; x++) {
 		for (int y = 7; y < LEVEL_HEIGHT; y++) {
 
-			sprite_indices[x + y * LEVEL_WIDTH] = y > 9 ? 1 : 1 - ((x / 3) % 3 % 2);
+			sprite_indices[x + y * LEVEL_WIDTH] = y > 10 ? 1 : ((x / 6 + 1) % 3 % 2);
 		}
 	}
 
@@ -86,7 +86,7 @@ void process(unsigned long time, int input) {
 
 	// gravity (if recently jumped, make gravity lesser if holding jump, otherwise greater)
 	// ("recently jumped" is longer the faster you're running)
-	if ((time - time_of_last_jump) < 12 + ABS(player_dx) * 2) {
+	if ((time - time_of_last_jump) < 10 + ABS(player_dx) * 4) {
 
 		if (PRESSED(UP, input)) {
 			player_dy += 0.04;
@@ -131,9 +131,10 @@ void process(unsigned long time, int input) {
 	while (player_middle_pos + camera_x >= 20 && camera_x > 0) { camera_x--; }
 	while (player_middle_pos + camera_x <= -20) { camera_x++; }
 
-	// render
+	// render grid
 	draw_grid(grid_sprites, sprite_indices, LEVEL_WIDTH, LEVEL_HEIGHT, -camera_x, 0);
 
+	// render player (determine animation too)
 	int player_sprite_index = 0;
 
 	if (time_of_last_grounded != time) {
@@ -141,7 +142,7 @@ void process(unsigned long time, int input) {
 		run_cycle_timer = 0.0;
 		player_sprite_index = 4;
 
-	} else if ((ABS(player_dx) < 0.3 && !PRESSED(LEFT, input) && !PRESSED(RIGHT, input)) || collided_horizontally) {
+	} else if ((ABS(player_dx) < 0.2 && !PRESSED(LEFT, input) && !PRESSED(RIGHT, input)) || collided_horizontally) {
 
 		run_cycle_timer = 0.0;
 		player_sprite_index = 0;
@@ -164,5 +165,6 @@ void process(unsigned long time, int input) {
 		flipped
 	);
 
+	// draw text
     draw_text(font, "ARROW KEYS TO MOVE\nZ IS CONFIRM\nX IS CANCEL\nC IS MENU", 100, 20);
 }
