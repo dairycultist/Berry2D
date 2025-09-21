@@ -85,7 +85,7 @@ void process_level(unsigned long time, int input) {
 		time_of_last_pressed_jump = time;
 	}
 
-	if (aabb_collides(16, 32, player_x, player_y + 1)) {
+	if (aabb_collides(16, 28, player_x, player_y + 1)) {
 
 		// register grounded at this time
 		time_of_last_grounded = time;
@@ -129,13 +129,13 @@ void process_level(unsigned long time, int input) {
 	// move player w/ collision
 	collided_horizontally = FALSE;
 
-	while (aabb_collides(16, 32, player_x + player_dx, player_y)) {
+	while (aabb_collides(16, 28, player_x + player_dx, player_y)) {
 		player_dx *= 0.7;
 		collided_horizontally = TRUE;
 	}
 	player_x += player_dx;
 
-	while (aabb_collides(16, 32, player_x, player_y + player_dy)) {
+	while (aabb_collides(16, 28, player_x, player_y + player_dy)) {
 		player_dy *= 0.7;
 	}
 	player_y += player_dy;
@@ -185,7 +185,7 @@ void draw_level(unsigned long time, int input) {
 		player_sprite,
 		player_sprite_index,
 		(int) player_x - camera_x,
-		(int) player_y,
+		(int) player_y - 4,
 		flipped
 	);
 
