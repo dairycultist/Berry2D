@@ -69,9 +69,11 @@ static int aabb_collides(int w, int h, int x, int y) {
 	if (y < 0 || y + h >= level->map_height * 16)
 		return 0;
 
-	return level->map[x / 16 + y / 16 * level->map_width]
+	return level->map[x / 16 + y / 16 * level->map_width] // top, left/right
 		|| level->map[(x + w) / 16 + y / 16 * level->map_width]
-		|| level->map[x / 16 + (y + h) / 16 * level->map_width]
+		|| level->map[x / 16 + (y + h / 2) / 16 * level->map_width] // middle, left/right (otherwise, you can slide between 1-tall terrain)
+		|| level->map[(x + w) / 16 + (y + h / 2) / 16 * level->map_width]
+		|| level->map[x / 16 + (y + h) / 16 * level->map_width] // bottom, left/right
 		|| level->map[(x + w) / 16 + (y + h) / 16 * level->map_width];
 }
 

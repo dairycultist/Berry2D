@@ -369,6 +369,6 @@ void free_sprite_map(SpriteMap *sprite_map) {
 	free(sprite_map->layers);
 	free(sprite_map->sprite_sheets);
 
-	// free the spritemap
+	// free the sprite map
 	free(sprite_map);
 }
