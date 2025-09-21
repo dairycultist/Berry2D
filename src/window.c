@@ -229,7 +229,7 @@ static int get_from_indexer(int *indexer, int indexer_width, int indexer_height,
 	return indexer[x + y * indexer_width];
 }
 
-static inline void connect_index(int *indexer, int indexer_width, int indexer_height, int x, int y) {
+static inline void smooth_at_point_in_indexer(int *indexer, int indexer_width, int indexer_height, int x, int y) {
 
 	// 9, 16, 47 tile, currently 9
 	int up, down, left, right;
@@ -269,7 +269,24 @@ static inline void connect_index(int *indexer, int indexer_width, int indexer_he
 	}
 }
 
-SpriteMap *load_sprite_map(SpriteSheet **sprite_sheets, int sprite_sheet_count, int map_width, int map_height, int *map) {
+void update_sprite_map(SpriteMap *sprite_map, int sprite_sheet_to_update) {
+
+	// modify the sprite indexer to have TRUE only for values in map that match sprite_sheet_to_update
+	for (int i = 0; i < sprite_map->map_width * sprite_map->map_height; i++) {
+
+		sprite_map->sprite_indexers[sprite_sheet_to_update - 1][i] = sprite_map->map[i] == sprite_sheet_to_update;
+	}
+
+	// modify the sprite indexer to go from binary TRUE/FALSE to properly indexing the sprite sheet to smoothly connect
+	for (int x = 0; x < sprite_map->map_width; x++) {
+		for (int y = 0; y < sprite_map->map_height; y++) {
+
+			smooth_at_point_in_indexer(sprite_map->sprite_indexers[sprite_sheet_to_update - 1], sprite_map->map_width, sprite_map->map_height, x, y);
+		}
+	}
+}
+
+SpriteMap *load_sprite_map(SpriteSheet **sprite_sheets, int sprite_sheet_count, int map_width, int map_height) {
 
 	SpriteMap *sprite_map = malloc(sizeof(SpriteMap));
 
@@ -279,26 +296,12 @@ SpriteMap *load_sprite_map(SpriteSheet **sprite_sheets, int sprite_sheet_count, 
 
 	sprite_map->map_width = map_width;
 	sprite_map->map_height = map_height;
-	sprite_map->map = map;
+	sprite_map->map = calloc(map_width * map_height, sizeof(int));
 
 	for (int sprite_sheet = 0; sprite_sheet < sprite_sheet_count; sprite_sheet++) {
 
 		// create an array of indexers for this sprite sheet the size of the map
 		sprite_map->sprite_indexers[sprite_sheet] = malloc(sizeof(int) * map_width * map_height);
-
-		// initialize it with TRUE for every value in map that matches sprite_sheet
-		for (int i = 0; i < map_width * map_height; i++) {
-
-			sprite_map->sprite_indexers[sprite_sheet][i] = map[i] == sprite_sheet + 1;
-		}
-
-		// modify the sprite indexer to go from binary TRUE/FALSE to properly indexing the sprite sheet to be connected
-		for (int x = 0; x < map_width; x++) {
-			for (int y = 0; y < map_height; y++) {
-
-				connect_index(sprite_map->sprite_indexers[sprite_sheet], map_width, map_height, x, y);
-			}
-		}
 	}
 
 	return sprite_map;
@@ -337,7 +340,10 @@ void draw_sprite_map(SpriteMap *sprite_map, int x, int y) {
 
 void free_sprite_map(SpriteMap *sprite_map) {
 
-	// note this doesn't free attached sprite_sheets
+	// TODO doesn't free attached sprite_sheets
+
+	// free map
+	free(sprite_map->map);
 
 	// free all array entries in sprite_indexers
 	for (int i = 0; i < sprite_map->sprite_sheet_count; i++)

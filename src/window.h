@@ -58,6 +58,7 @@ void free_sprite_sheet(SpriteSheet *sprite_sheet);
 typedef struct {
 
 	// these variable names gotta change lol they're not very transparent
+	// sprite_indexers -> layers (e.g. update_sprite_map -> update_sprite_map_layer)
 
 	int sprite_sheet_count;
 	SpriteSheet **sprite_sheets; // need to have sprites that are the same size, or else undefined behaviour
@@ -69,8 +70,9 @@ typedef struct {
 
 } SpriteMap;
 
-SpriteMap *load_sprite_map(SpriteSheet **sprite_sheets, int sprite_sheet_count, int map_width, int map_height, int *map);
+SpriteMap *load_sprite_map(SpriteSheet **sprite_sheets, int sprite_sheet_count, int map_width, int map_height);
 void draw_sprite_map(SpriteMap *sprite_map, int x, int y);
+void update_sprite_map(SpriteMap *sprite_map, int sprite_sheet_to_smooth);
 void free_sprite_map(SpriteMap *sprite_map);
 
 // implemented in logic.c
