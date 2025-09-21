@@ -130,19 +130,24 @@ void process(unsigned long time, int input) {
 	// render
 	draw_grid(grid_sprites, sprite_indices, LEVEL_WIDTH, LEVEL_HEIGHT, -camera_x, 0);
 
+	int player_sprite_index = 0;
+
 	if (ABS(player_dx) < 0.3) {
 		run_cycle_timer = 0.0;
+		player_sprite_index = 0;
 	} else {
 		run_cycle_timer += (ABS(player_dx) + 1) / 20;
 		
 		if (run_cycle_timer >= 4.0) {
 			run_cycle_timer -= 4.0;
 		}
+
+		player_sprite_index = run_cycle_timer < 3.0 ? 1 + (int) run_cycle_timer : 2;
 	}
 
 	draw_sprite_from_sheet(
 		player_sprite,
-		run_cycle_timer < 3.0 ? 1 + (int) run_cycle_timer : 2,
+		player_sprite_index,
 		(int) player_x - camera_x,
 		(int) player_y,
 		flipped
