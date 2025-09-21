@@ -1,7 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include "window.h"
-#include "logic.h"
 
 static SDL_Window *window;
 static SDL_Renderer *renderer;

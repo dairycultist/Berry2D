@@ -1,7 +1,8 @@
 #include "window.h"
-#include "logic.h"
 
 #include "logic_states/play_level.c"
+// edit_level.c
+// main_menu.c (has level selection and stuff)
 
 void init() {
 

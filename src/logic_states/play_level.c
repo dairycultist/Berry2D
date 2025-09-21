@@ -40,7 +40,7 @@ void init_level() {
 
 	connect_indices(sprite_indices, LEVEL_WIDTH, LEVEL_HEIGHT);
 
-	set_clear_color(65, 65, 120);
+	set_clear_color(100, 180, 255);
 }
 
 static int aabb_collides(int w, int h, int x, int y) {

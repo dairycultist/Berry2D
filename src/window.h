@@ -61,4 +61,8 @@ void free_sprite_sheet(SpriteSheet *sprite_sheet);
 void connect_index(int *indices, int indices_width, int indices_height, int x, int y);
 void connect_indices(int *indices, int indices_width, int indices_height);
 
+// implemented in logic.c
+void init();
+void process(unsigned long time, int input);
+
 #endif
