@@ -48,12 +48,10 @@ void init_level() { // TODO pass filepath corresponding to level data
 	set_clear_color(100, 180, 255);
 
 	// initialize SpriteMap representing the level
-	SpriteSheet **sprite_sheets = malloc(sizeof(SpriteSheet *) * 2);
+	level = create_sprite_map(16, 16, LEVEL_WIDTH, LEVEL_HEIGHT);
 
-	sprite_sheets[0] = load_sprite_sheet("res/ground.png", 16, 16);
-	sprite_sheets[1] = load_sprite_sheet("res/brick.png", 16, 16);
-
-	level = create_sprite_map(sprite_sheets, 2, LEVEL_WIDTH, LEVEL_HEIGHT);
+	add_layer_to_sprite_map(level, "res/ground.png");
+	add_layer_to_sprite_map(level, "res/brick.png");
 
 	memcpy(level->map + LEVEL_WIDTH * 3, map, sizeof(map));
 

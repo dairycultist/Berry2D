@@ -66,20 +66,22 @@ typedef struct {
 	int **layers; // stores what sprite within a sprite sheet to use (each array shares an index with the sprite sheet it indexes into)
 	SpriteSheet **sprite_sheets; // sprite sheet for each layer (all need to have sprites that are the same size, or else undefined behaviour)
 
+	int sprite_width;
+	int sprite_height;
+
 	int map_width;
 	int map_height;
 	int *map; // stores what layer (+ sprite sheet) to use at each position
 
 } SpriteMap;
 
-// 1. add sprite_width and sprite_height to create_sprite_map
-// 2. add add_layer_to_sprite_map(const char *sprite_sheet_path)
-SpriteMap *create_sprite_map(SpriteSheet **sprite_sheets, int layer_count, int map_width, int map_height);
+SpriteMap *create_sprite_map(int sprite_width, int sprite_height, int map_width, int map_height);
+void add_layer_to_sprite_map(SpriteMap *sprite_map, const char *sprite_sheet_path);
 void draw_sprite_map(SpriteMap *sprite_map, int x, int y);
 void flush_sprite_map(SpriteMap *sprite_map); // if you update ->map, you need to flush the changes so they're reflected in the layers (which determine what's drawn)
 void free_sprite_map(SpriteMap *sprite_map);
 // maybe add a "set_in_sprite_map" that will automatically flush the relevant layers, and only around the set position, if you
-// don't want to update ->map and then flush
+// want to be more efficient than updating ->map and then flushing the ENTIRE sprite map
 
 // implemented in logic.c
 void init();
