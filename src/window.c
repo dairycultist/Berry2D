@@ -252,7 +252,7 @@ void flush_sprite_map_at(int x, int y, SpriteMap *sprite_map) {
 	if (sheet == 0)
 		return;
 	
-	int up, down, left, right;
+	int up, down, left, right, upleft, upright, downleft, downright;
 
 	if (sprite_map->sprite_sheet_types[sheet - 1] == SELF_CONNECTING) {
 
@@ -260,6 +260,10 @@ void flush_sprite_map_at(int x, int y, SpriteMap *sprite_map) {
 		down  = sheet_at_xy(sheet, sprite_map, x, y + 1) == sheet;
 		left  = sheet_at_xy(sheet, sprite_map, x - 1, y) == sheet;
 		right = sheet_at_xy(sheet, sprite_map, x + 1, y) == sheet;
+		upleft    = sheet_at_xy(sheet, sprite_map, x - 1, y - 1) == sheet;
+		upright   = sheet_at_xy(sheet, sprite_map, x + 1, y - 1) == sheet;
+		downleft  = sheet_at_xy(sheet, sprite_map, x - 1, y + 1) == sheet;
+		downright = sheet_at_xy(sheet, sprite_map, x + 1, y + 1) == sheet;
 
 	} else if (sprite_map->sprite_sheet_types[sheet - 1] == ALL_CONNECTING) {
 
@@ -267,6 +271,10 @@ void flush_sprite_map_at(int x, int y, SpriteMap *sprite_map) {
 		down  = sheet_at_xy(sheet, sprite_map, x, y + 1);
 		left  = sheet_at_xy(sheet, sprite_map, x - 1, y);
 		right = sheet_at_xy(sheet, sprite_map, x + 1, y);
+		upleft    = sheet_at_xy(sheet, sprite_map, x - 1, y - 1);
+		upright   = sheet_at_xy(sheet, sprite_map, x + 1, y - 1);
+		downleft  = sheet_at_xy(sheet, sprite_map, x - 1, y + 1);
+		downright = sheet_at_xy(sheet, sprite_map, x + 1, y + 1);
 
 	} else {
 		return;
@@ -323,7 +331,17 @@ void flush_sprite_map_at(int x, int y, SpriteMap *sprite_map) {
 		} else if (!right) {
 			*sprite = 19;
 		} else {
-			*sprite = 18;
+			if (!upleft) {
+				*sprite = 13;
+			} else if (!upright) {
+				*sprite = 12;
+			} else if (!downleft) {
+				*sprite = 5;
+			} else if (!downright) {
+				*sprite = 4;
+			} else {
+				*sprite = 18;
+			}
 		}
 	}
 }
