@@ -8,8 +8,7 @@ A platformer engine akin to [Super Mario Bros. Remastered](https://github.com/JH
 
 320 × 200 (8:5) screen resolution, 60fps, D-pad + 3 action buttons
 
-next big milestone is probably a level editor, tho I still gotta work on a level file format, enemies, ending a level, and a menu system as well.
-I might add a "charge" mechanic where you break bricks when running into them fast enough as well, kinda like SMB3's P speed thingy, once you reach your max speed you'll have a different "charging" animation, also lets you ram through enemies instead of having to jump on them
+next big milestone is probably a level editor, tho I still gotta work on a level file format, arbitrary entity system (particles + enemies), ending a level, and a menu system as well.
 
 ## Installation
 

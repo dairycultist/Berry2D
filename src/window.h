@@ -62,7 +62,7 @@ void free_sprite_sheet(SpriteSheet *sprite_sheet);
 
 typedef struct {
 
-	SpriteSheet **sprite_sheets; // sprite sheet for each layer (all need to have sprites that are the same size, or else undefined behaviour)
+	SpriteSheet **sprite_sheets; // all need to have sprites that are the same size, or else undefined behaviour!
 	int sprite_sheet_count;
 
 	int sprite_width;
@@ -72,17 +72,17 @@ typedef struct {
 	int map_height;
 
 	int *sheet_map; // stores what sprite_sheet to use at each position
-	int *sprite_map; // stores what sprite within a sprite sheet to use (independent of layer) (may have to rename since it shares a name with SpriteMap...)
+	int *sprite_map; // stores what sprite within a sprite sheet to use (independent of sprite sheet)
 
-} SpriteMap;
+} SpriteMap; // might rename to Grid or TileGrid since it shares a name with ->sprite_map
 
 SpriteMap *create_sprite_map(int sprite_width, int sprite_height, int map_width, int map_height);
 void add_sprite_sheet_to_sprite_map(SpriteMap *sprite_map, const char *sprite_sheet_path);
 void draw_sprite_map(SpriteMap *sprite_map, int x, int y);
-void flush_sprite_map(SpriteMap *sprite_map); // if you update ->map, you need to flush the changes so they're reflected in the layers (which determine what's drawn)
+void flush_sprite_map(SpriteMap *sprite_map); // if you update ->sheet_map, you need to flush the changes so they're reflected in ->sprite_map
 void free_sprite_map(SpriteMap *sprite_map);
-// maybe add a "set_in_sprite_map" that will automatically flush the relevant layers, and only around the set position, if you
-// want to be more efficient than updating ->map and then flushing the ENTIRE sprite map
+// maybe add a "set_in_sprite_map" that will automatically flush only around the set position, if you
+// want to be more efficient than updating ->sheet_map and then flushing the ENTIRE SpriteMap
 
 // implemented in logic.c
 void init();

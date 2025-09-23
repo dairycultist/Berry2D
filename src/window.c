@@ -234,15 +234,15 @@ static inline void smooth_position_in_sprite_map(SpriteMap *sprite_map, int x, i
 	// 9, 16, 47 tile, currently 16
 	int up, down, left, right;
 
-	int *sheet = &(sprite_map->sheet_map[x + y * sprite_map->map_width]);
+	int sheet = sprite_map->sheet_map[x + y * sprite_map->map_width];
 
-	if (*sheet == 0)
+	if (sheet == 0)
 		return;
 
-	up    = sheet_at_xy_connects_with(*sheet, sprite_map, x, y - 1);
-	down  = sheet_at_xy_connects_with(*sheet, sprite_map, x, y + 1);
-	left  = sheet_at_xy_connects_with(*sheet, sprite_map, x - 1, y);
-	right = sheet_at_xy_connects_with(*sheet, sprite_map, x + 1, y);
+	up    = sheet_at_xy_connects_with(sheet, sprite_map, x, y - 1);
+	down  = sheet_at_xy_connects_with(sheet, sprite_map, x, y + 1);
+	left  = sheet_at_xy_connects_with(sheet, sprite_map, x - 1, y);
+	right = sheet_at_xy_connects_with(sheet, sprite_map, x + 1, y);
 
 	int *sprite = &(sprite_map->sprite_map[x + y * sprite_map->map_width]);
 
