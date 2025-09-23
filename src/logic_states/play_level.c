@@ -18,6 +18,7 @@ static unsigned long time_of_last_grounded;
 static bool collided_horizontally;
 
 #define MAX_RUN_SPEED 2.5
+#define MIN_CHARGE_SPEED 2.2
 #define SLIPPERINESS 0.97
 
 #define LEVEL_WIDTH 400
@@ -129,9 +130,20 @@ void process_level(unsigned long time, int input) {
 	// move player w/ collision
 	collided_horizontally = FALSE;
 
-	while (aabb_collides(16, 28, player_x + player_dx, player_y)) {
-		player_dx *= 0.7;
-		collided_horizontally = TRUE;
+	if (ABS(player_dx) > MIN_CHARGE_SPEED) { // special case for charging, instead of stopping horizontally on wall collision, you bounce back + up
+
+		if (aabb_collides(16, 28, player_x + player_dx, player_y)) {
+
+			player_dx *= -1;
+			player_dy -= 1.5;
+		}
+
+	} else {
+
+		while (aabb_collides(16, 28, player_x + player_dx, player_y)) {
+			player_dx *= 0.7;
+			collided_horizontally = TRUE;
+		}
 	}
 	player_x += player_dx;
 
@@ -167,6 +179,11 @@ void draw_level(unsigned long time, int input) {
 		run_cycle_timer = 0.0;
 		player_sprite_index = 4;
 
+		// airborne AND charging
+		if (ABS(player_dx) > MIN_CHARGE_SPEED) {
+			player_sprite_index = 6;
+		}
+
 	} else if ((ABS(player_dx) < 0.2 && !PRESSED(LEFT, input) && !PRESSED(RIGHT, input)) || collided_horizontally) {
 
 		// not moving
@@ -175,19 +192,21 @@ void draw_level(unsigned long time, int input) {
 
 	} else {
 
-		// running
 		run_cycle_timer += (ABS(player_dx) + 1) / 20;
 		
 		if (run_cycle_timer >= 4.0) {
 			run_cycle_timer -= 4.0;
 		}
 
-		player_sprite_index = run_cycle_timer < 3.0 ? 1 + (int) run_cycle_timer : 2;
-
 		// running AND charging
-		if (ABS(player_dx) > 2.2) {
+		if (ABS(player_dx) > MIN_CHARGE_SPEED) {
 
-			player_sprite_index += 4;
+			player_sprite_index = 5 + ((int) run_cycle_timer) % 2;
+
+		// running
+		} else {
+
+			player_sprite_index = run_cycle_timer < 3.0 ? 1 + (int) run_cycle_timer : 2;
 		}
 	}
 
