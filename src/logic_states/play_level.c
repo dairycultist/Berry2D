@@ -68,16 +68,13 @@ static inline int point_collides(int x, int y) {
 
 	#define IS_SOLID(sprite) ((sprite) != 0 && (sprite) != 3)
 
-	x /= 16;
-	y /= 16;
-
-	if (x < 0 || x >= level->map_width)
+	if (x < 0 || x >= level->map_width * 16)
 		return 1;
 
-	if (y < 0 || y >= level->map_height)
+	if (y < 0 || y >= level->map_height * 16)
 		return 0;
 
-	return IS_SOLID(level->sheet_map[x + y * level->map_width]);
+	return IS_SOLID(level->sheet_map[x / 16 + y / 16 * level->map_width]);
 }
 
 static int aabb_collides(int w, int h, int x, int y) {
@@ -191,7 +188,7 @@ void process_level(unsigned long time, int input) {
 	int player_middle_pos = WIDTH / 2 - ((int) player_x + 8);
 
 	while (player_middle_pos + camera_x >= 20 && camera_x > 0) { camera_x--; }
-	while (player_middle_pos + camera_x <= -20) { camera_x++; }
+	while (player_middle_pos + camera_x <= -20 && camera_x < LEVEL_WIDTH * level->sprite_width - WIDTH) { camera_x++; }
 }
 
 void draw_level(unsigned long time, int input) {
