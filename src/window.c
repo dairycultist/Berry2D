@@ -221,12 +221,12 @@ void free_sprite_sheet(SpriteSheet *sprite_sheet) {
 }
 
 // (poorly named) helper for flush_sprite_map_at
-static int sheet_at_xy_connects_with(int target_sheet, SpriteMap *sprite_map, int x, int y) {
+static int sheet_at_xy(int edge_sheet, SpriteMap *sprite_map, int x, int y) {
 
 	if (x < 0 || x >= sprite_map->map_width || y < 0 || y >= sprite_map->map_height)
-		return TRUE; // connect off the edge of the screen
+		return edge_sheet;
 
-	return sprite_map->sheet_map[x + y * sprite_map->map_width] == target_sheet;
+	return sprite_map->sheet_map[x + y * sprite_map->map_width];
 }
 
 void flush_sprite_map_at(int x, int y, SpriteMap *sprite_map) {
@@ -239,10 +239,23 @@ void flush_sprite_map_at(int x, int y, SpriteMap *sprite_map) {
 	// for connecting-type sprite sheets (should be 47 tile, currently 16)
 	int up, down, left, right;
 
-	up    = sheet_at_xy_connects_with(sheet, sprite_map, x, y - 1);
-	down  = sheet_at_xy_connects_with(sheet, sprite_map, x, y + 1);
-	left  = sheet_at_xy_connects_with(sheet, sprite_map, x - 1, y);
-	right = sheet_at_xy_connects_with(sheet, sprite_map, x + 1, y);
+	if (sprite_map->sprite_sheet_types[sheet - 1] == SELF_CONNECTING) {
+
+		up    = sheet_at_xy(sheet, sprite_map, x, y - 1) == sheet;
+		down  = sheet_at_xy(sheet, sprite_map, x, y + 1) == sheet;
+		left  = sheet_at_xy(sheet, sprite_map, x - 1, y) == sheet;
+		right = sheet_at_xy(sheet, sprite_map, x + 1, y) == sheet;
+
+	} else if (sprite_map->sprite_sheet_types[sheet - 1] == ALL_CONNECTING) {
+
+		up    = sheet_at_xy(sheet, sprite_map, x, y - 1);
+		down  = sheet_at_xy(sheet, sprite_map, x, y + 1);
+		left  = sheet_at_xy(sheet, sprite_map, x - 1, y);
+		right = sheet_at_xy(sheet, sprite_map, x + 1, y);
+
+	} else {
+		return;
+	}
 
 	int *sprite = &(sprite_map->sprite_map[x + y * sprite_map->map_width]);
 
@@ -315,6 +328,7 @@ SpriteMap *create_sprite_map(int sprite_width, int sprite_height, int map_width,
 	SpriteMap *sprite_map = malloc(sizeof(SpriteMap));
 
 	sprite_map->sprite_sheets = malloc(0);
+	sprite_map->sprite_sheet_types = malloc(0);
 	sprite_map->sprite_sheet_count = 0;
 
 	sprite_map->sprite_width = sprite_width;
@@ -329,15 +343,17 @@ SpriteMap *create_sprite_map(int sprite_width, int sprite_height, int map_width,
 	return sprite_map;
 }
 
-void add_sprite_sheet_to_sprite_map(SpriteMap *sprite_map, const char *sprite_sheet_path) {
+void add_sprite_sheet_to_sprite_map(SpriteMap *sprite_map, const char *sprite_sheet_path, SpriteSheetType sprite_sheet_type) {
 
 	sprite_map->sprite_sheet_count++;
 
-	// make space for this SpriteSheet
-	sprite_map->sprite_sheets = realloc(sprite_map->sprite_sheets, sizeof(SpriteSheet *) * sprite_map->sprite_sheet_count);
+	// make space for this SpriteSheet and its SpriteSheetType
+	sprite_map->sprite_sheets      = realloc(sprite_map->sprite_sheets,      sizeof(SpriteSheet *)   * sprite_map->sprite_sheet_count);
+	sprite_map->sprite_sheet_types = realloc(sprite_map->sprite_sheet_types, sizeof(SpriteSheetType) * sprite_map->sprite_sheet_count);
 
 	// load the SpriteSheet
 	sprite_map->sprite_sheets[sprite_map->sprite_sheet_count - 1] = load_sprite_sheet(sprite_sheet_path, sprite_map->sprite_width, sprite_map->sprite_height);
+	sprite_map->sprite_sheet_types[sprite_map->sprite_sheet_count - 1] = sprite_sheet_type;
 }
 
 void draw_sprite_map(SpriteMap *sprite_map, int x, int y) {
@@ -385,6 +401,7 @@ void free_sprite_map(SpriteMap *sprite_map) {
 	}
 
 	free(sprite_map->sprite_sheets);
+	free(sprite_map->sprite_sheet_types);
 
 	// free the sprite map
 	free(sprite_map);

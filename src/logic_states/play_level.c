@@ -54,9 +54,9 @@ void init_level() { // TODO pass filepath corresponding to level data
 	// initialize SpriteMap representing the level
 	level = create_sprite_map(16, 16, LEVEL_WIDTH, LEVEL_HEIGHT);
 
-	add_sprite_sheet_to_sprite_map(level, "res/ground.png");
-	add_sprite_sheet_to_sprite_map(level, "res/brick.png");
-	add_sprite_sheet_to_sprite_map(level, "res/brick_broken.png");
+	add_sprite_sheet_to_sprite_map(level, "res/ground.png", SELF_CONNECTING);
+	add_sprite_sheet_to_sprite_map(level, "res/brick.png", SELF_CONNECTING);
+	add_sprite_sheet_to_sprite_map(level, "res/brick_broken.png", ALL_CONNECTING);
 
 	memcpy(level->sheet_map, map, sizeof(map));
 
