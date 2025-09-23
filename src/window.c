@@ -236,7 +236,6 @@ void flush_sprite_map_at(int x, int y, SpriteMap *sprite_map) {
 	if (sheet == 0)
 		return;
 	
-	// for connecting-type sprite sheets (should be 47 tile, currently 16)
 	int up, down, left, right;
 
 	if (sprite_map->sprite_sheet_types[sheet - 1] == SELF_CONNECTING) {
@@ -257,6 +256,7 @@ void flush_sprite_map_at(int x, int y, SpriteMap *sprite_map) {
 		return;
 	}
 
+	// do neighborhood calculations for connecting-type sprite sheets (should be 47 tile, currently 16)
 	int *sprite = &(sprite_map->sprite_map[x + y * sprite_map->map_width]);
 
 	if (!up) {
