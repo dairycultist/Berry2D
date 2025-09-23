@@ -302,7 +302,7 @@ void flush_sprite_map(SpriteMap *sprite_map) {
 		// modify the layer to have TRUE only for values in map that match layer_index
 		for (int i = 0; i < sprite_map->map_width * sprite_map->map_height; i++) {
 
-			sprite_map->layers[layer_index][i] = sprite_map->map[i] == layer_index + 1;
+			sprite_map->layers[layer_index][i] = sprite_map->map[i];
 		}
 
 		// modify the layer to go from binary TRUE/FALSE to properly indexing the sprite sheet for smooth sprite connections
