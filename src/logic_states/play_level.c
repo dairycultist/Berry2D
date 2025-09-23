@@ -124,19 +124,40 @@ void process_level(unsigned long time, int input) {
 		player_dy += 0.15;
 	}
 
-	// running
-    if (PRESSED(LEFT, input) && !PRESSED(RIGHT, input)) {
+	if (PRESSED(DOWN, input)) {
 
-        player_dx = player_dx * SLIPPERINESS - MAX_RUN_SPEED * (1.0 - SLIPPERINESS);
-		flipped = TRUE;
+		// crouch jumping
+		if (PRESSED(LEFT, input) && !PRESSED(RIGHT, input)) {
 
-	} else if (PRESSED(RIGHT, input) && !PRESSED(LEFT, input)) {
+			if (time_of_last_grounded != time)
+				player_dx = player_dx * SLIPPERINESS - MAX_RUN_SPEED * (1.0 - SLIPPERINESS);
+			flipped = TRUE;
 
-        player_dx = player_dx * SLIPPERINESS + MAX_RUN_SPEED * (1.0 - SLIPPERINESS);
-		flipped = FALSE;
+		} else if (PRESSED(RIGHT, input) && !PRESSED(LEFT, input)) {
 
-	} else
+			if (time_of_last_grounded != time)
+				player_dx = player_dx * SLIPPERINESS + MAX_RUN_SPEED * (1.0 - SLIPPERINESS);
+			flipped = FALSE;
+		}
+
 		player_dx *= SLIPPERINESS;
+
+	} else {
+
+		// running
+		if (PRESSED(LEFT, input) && !PRESSED(RIGHT, input)) {
+
+			player_dx = player_dx * SLIPPERINESS - MAX_RUN_SPEED * (1.0 - SLIPPERINESS);
+			flipped = TRUE;
+
+		} else if (PRESSED(RIGHT, input) && !PRESSED(LEFT, input)) {
+
+			player_dx = player_dx * SLIPPERINESS + MAX_RUN_SPEED * (1.0 - SLIPPERINESS);
+			flipped = FALSE;
+
+		} else
+			player_dx *= SLIPPERINESS;
+	}
 
 	// move player w/ collision
 	collided_horizontally = FALSE;

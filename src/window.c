@@ -231,13 +231,13 @@ static int sheet_at_xy_connects_with(int target_sheet, SpriteMap *sprite_map, in
 
 void flush_sprite_map_at(int x, int y, SpriteMap *sprite_map) {
 
-	// 9, 16, 47 tile, currently 16
-	int up, down, left, right;
-
 	int sheet = sprite_map->sheet_map[x + y * sprite_map->map_width];
 
 	if (sheet == 0)
 		return;
+	
+	// for connecting-type sprite sheets (should be 47 tile, currently 16)
+	int up, down, left, right;
 
 	up    = sheet_at_xy_connects_with(sheet, sprite_map, x, y - 1);
 	down  = sheet_at_xy_connects_with(sheet, sprite_map, x, y + 1);
@@ -301,8 +301,7 @@ void flush_sprite_map_at(int x, int y, SpriteMap *sprite_map) {
 
 void flush_sprite_map(SpriteMap *sprite_map) {
 
-	// populate sprite_map->sprite_map with smoothed sprite data based on sprite_map->sheet_map
-	// (smoothed = properly-connected sprite following the assumed 8x8 tilemap format)
+	// populate sprite_map->sprite_map with connected sprite data (following the assumed 8x8 tilemap format) based on sprite_map->sheet_map
 	for (int x = 0; x < sprite_map->map_width; x++) {
 		for (int y = 0; y < sprite_map->map_height; y++) {
 

@@ -77,7 +77,7 @@ typedef struct {
 } SpriteMap; // might rename to Grid or TileGrid since it shares a name with ->sprite_map
 
 SpriteMap *create_sprite_map(int sprite_width, int sprite_height, int map_width, int map_height);
-void add_sprite_sheet_to_sprite_map(SpriteMap *sprite_map, const char *sprite_sheet_path); // TODO add SpriteSheetType enum which defines sprite indexing in sprite_map, e.g. self_joining, all_joining, single_sprite, x_mod_8
+void add_sprite_sheet_to_sprite_map(SpriteMap *sprite_map, const char *sprite_sheet_path); // TODO add SpriteSheetType enum which defines sprite indexing in sprite_map, e.g. self_connecting, all_connecting, single_sprite, x_mod_8
 void draw_sprite_map(SpriteMap *sprite_map, int x, int y);
 void flush_sprite_map(SpriteMap *sprite_map); // if you update ->sheet_map, you need to flush the changes so they're reflected in ->sprite_map
 void flush_sprite_map_at(int x, int y, SpriteMap *sprite_map);
