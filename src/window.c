@@ -220,91 +220,93 @@ void free_sprite_sheet(SpriteSheet *sprite_sheet) {
 	free(sprite_sheet);
 }
 
-// helpers for converting a grid of (essentially boolean) ints to a grid of properly-connected tiles following the assumed 8x8 tilemap format
-static int get_from_sprite_map(int *sprite_map, int map_width, int map_height, int x, int y) {
+// (poorly named) helper for smooth_position_in_sprite_map
+static int sheet_at_xy_connects_with(int target_sheet, SpriteMap *sprite_map, int x, int y) {
 
-	if (x < 0 || x >= map_width || y < 0 || y >= map_height)
-		return TRUE; // connect off the edge off the screen
+	if (x < 0 || x >= sprite_map->map_width || y < 0 || y >= sprite_map->map_height)
+		return TRUE; // connect off the edge of the screen
 
-	return sprite_map[x + y * map_width];
+	return sprite_map->sheet_map[x + y * sprite_map->map_width] == target_sheet;
 }
 
-static inline void smooth_sprite_in_sprite_map(int *sprite_map, int map_width, int map_height, int x, int y) {
+static inline void smooth_position_in_sprite_map(SpriteMap *sprite_map, int x, int y) {
 
 	// 9, 16, 47 tile, currently 16
 	int up, down, left, right;
 
-	if (sprite_map[x + y * map_width] == 0)
+	int *sheet = &(sprite_map->sheet_map[x + y * sprite_map->map_width]);
+
+	if (*sheet == 0)
 		return;
 
-	up = get_from_sprite_map(sprite_map, map_width, map_height, x, y - 1);
-	down = get_from_sprite_map(sprite_map, map_width, map_height, x, y + 1);
-	left = get_from_sprite_map(sprite_map, map_width, map_height, x - 1, y);
-	right = get_from_sprite_map(sprite_map, map_width, map_height, x + 1, y);
+	up    = sheet_at_xy_connects_with(*sheet, sprite_map, x, y - 1);
+	down  = sheet_at_xy_connects_with(*sheet, sprite_map, x, y + 1);
+	left  = sheet_at_xy_connects_with(*sheet, sprite_map, x - 1, y);
+	right = sheet_at_xy_connects_with(*sheet, sprite_map, x + 1, y);
+
+	int *sprite = &(sprite_map->sprite_map[x + y * sprite_map->map_width]);
 
 	if (!up) {
 		if (!down) {
 			if (!left) {
 				if (!right) {
-					sprite_map[x + y * map_width] = 32;
+					*sprite = 32;
 				} else {
-					sprite_map[x + y * map_width] = 1;
+					*sprite = 1;
 				}
 			} else if (!right) {
-				sprite_map[x + y * map_width] = 3;
+				*sprite = 3;
 			} else {
-				sprite_map[x + y * map_width] = 2;
+				*sprite = 2;
 			}
 		} else {
 			if (!left) {
 				if (!right) {
-					sprite_map[x + y * map_width] = 8;
+					*sprite = 8;
 				} else {
-					sprite_map[x + y * map_width] = 9;
+					*sprite = 9;
 				}
 			} else if (!right) {
-				sprite_map[x + y * map_width] = 11;
+				*sprite = 11;
 			} else {
-				sprite_map[x + y * map_width] = 10;
+				*sprite = 10;
 			}
 		}
 	} else if (!down) {
 		if (!left) {
 			if (!right) {
-					sprite_map[x + y * map_width] = 24;
+					*sprite = 24;
 				} else {
-					sprite_map[x + y * map_width] = 25;
+					*sprite = 25;
 				}
 		} else if (!right) {
-			sprite_map[x + y * map_width] = 27;
+			*sprite = 27;
 		} else {
-			sprite_map[x + y * map_width] = 26;
+			*sprite = 26;
 		}
 	} else {
 		if (!left) {
 			if (!right) {
-				sprite_map[x + y * map_width] = 16;
+				*sprite = 16;
 			} else {
-				sprite_map[x + y * map_width] = 17;
+				*sprite = 17;
 			}
 		} else if (!right) {
-			sprite_map[x + y * map_width] = 19;
+			*sprite = 19;
 		} else {
-			sprite_map[x + y * map_width] = 18;
+			*sprite = 18;
 		}
 	}
 }
 
 void flush_sprite_map(SpriteMap *sprite_map) {
 
-	// copy sheet_map into sprite_map
-	memcpy(sprite_map->sprite_map, sprite_map->sheet_map, sizeof(int) * sprite_map->map_width * sprite_map->map_height);
-
-	// convert sprite_map from housing sprite sheet index data to smooth sprite connections
+	// populate sprite_map->sprite_map with smoothed sprite data based on sprite_map->sheet_map
+	// (smoothed = properly-connected sprite following the assumed 8x8 tilemap format)
 	for (int x = 0; x < sprite_map->map_width; x++) {
 		for (int y = 0; y < sprite_map->map_height; y++) {
 
-			smooth_sprite_in_sprite_map(sprite_map->sprite_map, sprite_map->map_width, sprite_map->map_height, x, y);
+			smooth_position_in_sprite_map(sprite_map, x, y);
 		}
 	}
 }
@@ -343,11 +345,11 @@ void draw_sprite_map(SpriteMap *sprite_map, int x, int y) {
 
 	// calculate bounds of indices array that will actually be on screen
 	// this is unreadable but it works ok
-	int i_start = x >= 0 ? 0 : -x / sprite_map->sprite_sheets[0]->sprite_w;
-	int j_start = y >= 0 ? 0 : -y / sprite_map->sprite_sheets[0]->sprite_h;
+	int i_start = x >= 0 ? 0 : -x / sprite_map->sprite_width;
+	int j_start = y >= 0 ? 0 : -y / sprite_map->sprite_height;
 
-	int i_end = WIDTH >= (sprite_map->map_width + 1) * sprite_map->sprite_sheets[0]->sprite_w + x ? sprite_map->map_width : sprite_map->map_width + (WIDTH - sprite_map->map_width * sprite_map->sprite_sheets[0]->sprite_w - x) / sprite_map->sprite_sheets[0]->sprite_w;
-	int j_end = HEIGHT >= (sprite_map->map_height + 1) * sprite_map->sprite_sheets[0]->sprite_h + y ? sprite_map->map_height : sprite_map->map_height + (HEIGHT - sprite_map->map_height * sprite_map->sprite_sheets[0]->sprite_h - y) / sprite_map->sprite_sheets[0]->sprite_h;
+	int i_end = WIDTH >= (sprite_map->map_width + 1) * sprite_map->sprite_width + x ? sprite_map->map_width : sprite_map->map_width + (WIDTH - sprite_map->map_width * sprite_map->sprite_width - x) / sprite_map->sprite_width;
+	int j_end = HEIGHT >= (sprite_map->map_height + 1) * sprite_map->sprite_height + y ? sprite_map->map_height : sprite_map->map_height + (HEIGHT - sprite_map->map_height * sprite_map->sprite_height - y) / sprite_map->sprite_height;
 
 	// draw
 	for (int i = i_start; i < i_end; i++) {
