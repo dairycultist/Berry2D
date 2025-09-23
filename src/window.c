@@ -263,7 +263,7 @@ void flush_sprite_map_at(int x, int y, SpriteMap *sprite_map) {
 		if (!down) {
 			if (!left) {
 				if (!right) {
-					*sprite = 32;
+					*sprite = 0;
 				} else {
 					*sprite = 1;
 				}
