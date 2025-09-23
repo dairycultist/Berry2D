@@ -221,50 +221,76 @@ void free_sprite_sheet(SpriteSheet *sprite_sheet) {
 }
 
 // helpers for converting a grid of (essentially boolean) ints to a grid of properly-connected tiles following the assumed 8x8 tilemap format
-static int get_from_indexer(int *indexer, int indexer_width, int indexer_height, int x, int y) {
+static int get_from_layer(int *layer, int layer_width, int layer_height, int x, int y) {
 
-	if (x < 0 || x >= indexer_width || y < 0 || y >= indexer_height)
+	if (x < 0 || x >= layer_width || y < 0 || y >= layer_height)
 		return 0;
 
-	return indexer[x + y * indexer_width];
+	return layer[x + y * layer_width];
 }
 
-static inline void smooth_at_point_in_indexer(int *indexer, int indexer_width, int indexer_height, int x, int y) {
+static inline void smooth_sprite_in_layer(int *layer, int layer_width, int layer_height, int x, int y) {
 
-	// 9, 16, 47 tile, currently 9
+	// 9, 16, 47 tile, currently 16
 	int up, down, left, right;
 
-	if (indexer[x + y * indexer_width] == 0)
+	if (layer[x + y * layer_width] == 0)
 		return;
 
-	up = get_from_indexer(indexer, indexer_width, indexer_height, x, y - 1);
-	down = get_from_indexer(indexer, indexer_width, indexer_height, x, y + 1);
-	left = get_from_indexer(indexer, indexer_width, indexer_height, x - 1, y);
-	right = get_from_indexer(indexer, indexer_width, indexer_height, x + 1, y);
+	up = get_from_layer(layer, layer_width, layer_height, x, y - 1);
+	down = get_from_layer(layer, layer_width, layer_height, x, y + 1);
+	left = get_from_layer(layer, layer_width, layer_height, x - 1, y);
+	right = get_from_layer(layer, layer_width, layer_height, x + 1, y);
 
 	if (!up) {
-		if (!left) {
-			indexer[x + y * indexer_width] = 9;
-		} else if (!right) {
-			indexer[x + y * indexer_width] = 11;
+		if (!down) {
+			if (!left) {
+				if (!right) {
+					layer[x + y * layer_width] = 32;
+				} else {
+					layer[x + y * layer_width] = 1;
+				}
+			} else if (!right) {
+				layer[x + y * layer_width] = 3;
+			} else {
+				layer[x + y * layer_width] = 2;
+			}
 		} else {
-			indexer[x + y * indexer_width] = 10;
+			if (!left) {
+				if (!right) {
+					layer[x + y * layer_width] = 8;
+				} else {
+					layer[x + y * layer_width] = 9;
+				}
+			} else if (!right) {
+				layer[x + y * layer_width] = 11;
+			} else {
+				layer[x + y * layer_width] = 10;
+			}
 		}
 	} else if (!down) {
 		if (!left) {
-			indexer[x + y * indexer_width] = 25;
+			if (!right) {
+					layer[x + y * layer_width] = 24;
+				} else {
+					layer[x + y * layer_width] = 25;
+				}
 		} else if (!right) {
-			indexer[x + y * indexer_width] = 27;
+			layer[x + y * layer_width] = 27;
 		} else {
-			indexer[x + y * indexer_width] = 26;
+			layer[x + y * layer_width] = 26;
 		}
 	} else {
 		if (!left) {
-			indexer[x + y * indexer_width] = 17;
+			if (!right) {
+				layer[x + y * layer_width] = 16;
+			} else {
+				layer[x + y * layer_width] = 17;
+			}
 		} else if (!right) {
-			indexer[x + y * indexer_width] = 19;
+			layer[x + y * layer_width] = 19;
 		} else {
-			indexer[x + y * indexer_width] = 18;
+			layer[x + y * layer_width] = 18;
 		}
 	}
 }
@@ -273,17 +299,17 @@ void flush_sprite_map(SpriteMap *sprite_map) {
 
 	for (int layer_index = 0; layer_index < sprite_map->layer_count; layer_index++) {
 
-		// modify the sprite indexer to have TRUE only for values in map that match layer_index
+		// modify the layer to have TRUE only for values in map that match layer_index
 		for (int i = 0; i < sprite_map->map_width * sprite_map->map_height; i++) {
 
 			sprite_map->layers[layer_index][i] = sprite_map->map[i] == layer_index + 1;
 		}
 
-		// modify the sprite indexer to go from binary TRUE/FALSE to properly indexing the sprite sheet to smoothly connect
+		// modify the layer to go from binary TRUE/FALSE to properly indexing the sprite sheet for smooth sprite connections
 		for (int x = 0; x < sprite_map->map_width; x++) {
 			for (int y = 0; y < sprite_map->map_height; y++) {
 
-				smooth_at_point_in_indexer(sprite_map->layers[layer_index], sprite_map->map_width, sprite_map->map_height, x, y);
+				smooth_sprite_in_layer(sprite_map->layers[layer_index], sprite_map->map_width, sprite_map->map_height, x, y);
 			}
 		}
 	}
