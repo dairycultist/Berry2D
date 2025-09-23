@@ -48,7 +48,7 @@ void init_level() { // TODO pass filepath corresponding to level data (map + spr
 
 	// obvious stuff
 	player_sprite = load_sprite_sheet("res/char.png", 16, 32);
-    font = load_sprite_sheet("res/font.png", 6, 7);
+    font = load_sprite_sheet("res/font.png", 6, 6);
 	set_clear_color(100, 180, 255);
 
 	// initialize SpriteMap representing the level
@@ -261,5 +261,5 @@ void draw_level(unsigned long time, int input) {
 	);
 
 	// draw text
-    draw_text(font, "ARROW KEYS TO MOVE\nZ IS CONFIRM\nX IS CANCEL\nC IS MENU", 4, 4);
+    draw_text(font, "ARROW KEYS TO MOVE\nZ IS CONFIRM, X IS CANCEL, C IS MENU.\n(WHAT'S THAT?! +-*/)", 4, 4);
 }

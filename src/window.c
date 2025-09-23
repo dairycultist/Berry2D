@@ -199,10 +199,26 @@ void draw_text(SpriteSheet *sprite_sheet, char *text, int x, int y) {
 			x += sprite_sheet->sprite_w;
 		}
 
+		else if (*text == '!') {
+			draw_sprite_from_sheet(sprite_sheet, 26, x, y, FALSE);
+			x += sprite_sheet->sprite_w;
+		}
+
+		else if (*text == '?') {
+			draw_sprite_from_sheet(sprite_sheet, 27, x, y, FALSE);
+			x += sprite_sheet->sprite_w;
+		}
+
+		else if (*text >= '\'' && *text <= '/') {
+
+			draw_sprite_from_sheet(sprite_sheet, *text - 11, x, y, FALSE);
+			x += sprite_sheet->sprite_w;
+		}
+
 		else if (*text == '\n') {
 
 			x = start_x;
-			y += sprite_sheet->sprite_h;
+			y += sprite_sheet->sprite_h + 1; // + 1 for line height spacing
 		}
 
 		else if (*text == ' ') {
