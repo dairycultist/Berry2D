@@ -224,7 +224,7 @@ void free_sprite_sheet(SpriteSheet *sprite_sheet) {
 static int get_from_layer(int *layer, int layer_width, int layer_height, int x, int y) {
 
 	if (x < 0 || x >= layer_width || y < 0 || y >= layer_height)
-		return 0;
+		return TRUE; // connect off the edge off the screen
 
 	return layer[x + y * layer_width];
 }
@@ -299,10 +299,10 @@ void flush_sprite_map(SpriteMap *sprite_map) {
 
 	for (int layer_index = 0; layer_index < sprite_map->layer_count; layer_index++) {
 
-		// modify the layer to have TRUE only for values in map that match layer_index
+		// modify the layer to have TRUE only for values in map that match layer_index (which is 1-indexed)
 		for (int i = 0; i < sprite_map->map_width * sprite_map->map_height; i++) {
 
-			sprite_map->layers[layer_index][i] = sprite_map->map[i];
+			sprite_map->layers[layer_index][i] = sprite_map->map[i] == layer_index + 1;
 		}
 
 		// modify the layer to go from binary TRUE/FALSE to properly indexing the sprite sheet for smooth sprite connections
