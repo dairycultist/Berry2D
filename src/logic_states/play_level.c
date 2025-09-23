@@ -130,7 +130,7 @@ void process_level(unsigned long time, int input) {
 	// move player w/ collision
 	collided_horizontally = FALSE;
 
-	if (ABS(player_dx) > MIN_CHARGE_SPEED) { // special case for charging, instead of stopping horizontally on wall collision, you bounce back + up
+	if (ABS(player_dx) > MIN_CHARGE_SPEED && aabb_collides(16, 28, player_x, player_y + player_dy)) { // special case for charging WHILE grounded, instead of stopping horizontally on wall collision, you bounce back + up
 
 		if (aabb_collides(16, 28, player_x + player_dx, player_y)) {
 
