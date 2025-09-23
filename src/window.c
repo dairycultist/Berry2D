@@ -220,7 +220,7 @@ void free_sprite_sheet(SpriteSheet *sprite_sheet) {
 	free(sprite_sheet);
 }
 
-// (poorly named) helper for smooth_position_in_sprite_map
+// (poorly named) helper for flush_sprite_map_at
 static int sheet_at_xy_connects_with(int target_sheet, SpriteMap *sprite_map, int x, int y) {
 
 	if (x < 0 || x >= sprite_map->map_width || y < 0 || y >= sprite_map->map_height)
@@ -229,7 +229,7 @@ static int sheet_at_xy_connects_with(int target_sheet, SpriteMap *sprite_map, in
 	return sprite_map->sheet_map[x + y * sprite_map->map_width] == target_sheet;
 }
 
-static inline void smooth_position_in_sprite_map(SpriteMap *sprite_map, int x, int y) {
+void flush_sprite_map_at(int x, int y, SpriteMap *sprite_map) {
 
 	// 9, 16, 47 tile, currently 16
 	int up, down, left, right;
@@ -306,7 +306,7 @@ void flush_sprite_map(SpriteMap *sprite_map) {
 	for (int x = 0; x < sprite_map->map_width; x++) {
 		for (int y = 0; y < sprite_map->map_height; y++) {
 
-			smooth_position_in_sprite_map(sprite_map, x, y);
+			flush_sprite_map_at(x, y, sprite_map);
 		}
 	}
 }
