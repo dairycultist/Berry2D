@@ -44,7 +44,7 @@ static int map[LEVEL_WIDTH * LEVEL_HEIGHT] = {
 	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 };
 
-void init_level() { // TODO pass filepath corresponding to level data
+void init_level() { // TODO pass filepath corresponding to level data (map + sprite sheet to use for each "tile type")
 
 	// obvious stuff
 	player_sprite = load_sprite_sheet("res/char.png", 16, 32);
@@ -54,7 +54,7 @@ void init_level() { // TODO pass filepath corresponding to level data
 	// initialize SpriteMap representing the level
 	level = create_sprite_map(16, 16, LEVEL_WIDTH, LEVEL_HEIGHT);
 
-	add_sprite_sheet_to_sprite_map(level, "res/ground.png", SELF_CONNECTING);
+	add_sprite_sheet_to_sprite_map(level, "res/grass.png", SELF_CONNECTING);
 	add_sprite_sheet_to_sprite_map(level, "res/ice.png", SINGLE_SPRITE);
 	add_sprite_sheet_to_sprite_map(level, "res/ice_broken.png", SINGLE_SPRITE);
 	add_sprite_sheet_to_sprite_map(level, "res/spike.png", SINGLE_SPRITE);
