@@ -221,96 +221,90 @@ void free_sprite_sheet(SpriteSheet *sprite_sheet) {
 }
 
 // helpers for converting a grid of (essentially boolean) ints to a grid of properly-connected tiles following the assumed 8x8 tilemap format
-static int get_from_layer(int *layer, int layer_width, int layer_height, int x, int y) {
+static int get_from_sprite_map(int *sprite_map, int map_width, int map_height, int x, int y) {
 
-	if (x < 0 || x >= layer_width || y < 0 || y >= layer_height)
+	if (x < 0 || x >= map_width || y < 0 || y >= map_height)
 		return TRUE; // connect off the edge off the screen
 
-	return layer[x + y * layer_width];
+	return sprite_map[x + y * map_width];
 }
 
-static inline void smooth_sprite_in_layer(int *layer, int layer_width, int layer_height, int x, int y) {
+static inline void smooth_sprite_in_sprite_map(int *sprite_map, int map_width, int map_height, int x, int y) {
 
 	// 9, 16, 47 tile, currently 16
 	int up, down, left, right;
 
-	if (layer[x + y * layer_width] == 0)
+	if (sprite_map[x + y * map_width] == 0)
 		return;
 
-	up = get_from_layer(layer, layer_width, layer_height, x, y - 1);
-	down = get_from_layer(layer, layer_width, layer_height, x, y + 1);
-	left = get_from_layer(layer, layer_width, layer_height, x - 1, y);
-	right = get_from_layer(layer, layer_width, layer_height, x + 1, y);
+	up = get_from_sprite_map(sprite_map, map_width, map_height, x, y - 1);
+	down = get_from_sprite_map(sprite_map, map_width, map_height, x, y + 1);
+	left = get_from_sprite_map(sprite_map, map_width, map_height, x - 1, y);
+	right = get_from_sprite_map(sprite_map, map_width, map_height, x + 1, y);
 
 	if (!up) {
 		if (!down) {
 			if (!left) {
 				if (!right) {
-					layer[x + y * layer_width] = 32;
+					sprite_map[x + y * map_width] = 32;
 				} else {
-					layer[x + y * layer_width] = 1;
+					sprite_map[x + y * map_width] = 1;
 				}
 			} else if (!right) {
-				layer[x + y * layer_width] = 3;
+				sprite_map[x + y * map_width] = 3;
 			} else {
-				layer[x + y * layer_width] = 2;
+				sprite_map[x + y * map_width] = 2;
 			}
 		} else {
 			if (!left) {
 				if (!right) {
-					layer[x + y * layer_width] = 8;
+					sprite_map[x + y * map_width] = 8;
 				} else {
-					layer[x + y * layer_width] = 9;
+					sprite_map[x + y * map_width] = 9;
 				}
 			} else if (!right) {
-				layer[x + y * layer_width] = 11;
+				sprite_map[x + y * map_width] = 11;
 			} else {
-				layer[x + y * layer_width] = 10;
+				sprite_map[x + y * map_width] = 10;
 			}
 		}
 	} else if (!down) {
 		if (!left) {
 			if (!right) {
-					layer[x + y * layer_width] = 24;
+					sprite_map[x + y * map_width] = 24;
 				} else {
-					layer[x + y * layer_width] = 25;
+					sprite_map[x + y * map_width] = 25;
 				}
 		} else if (!right) {
-			layer[x + y * layer_width] = 27;
+			sprite_map[x + y * map_width] = 27;
 		} else {
-			layer[x + y * layer_width] = 26;
+			sprite_map[x + y * map_width] = 26;
 		}
 	} else {
 		if (!left) {
 			if (!right) {
-				layer[x + y * layer_width] = 16;
+				sprite_map[x + y * map_width] = 16;
 			} else {
-				layer[x + y * layer_width] = 17;
+				sprite_map[x + y * map_width] = 17;
 			}
 		} else if (!right) {
-			layer[x + y * layer_width] = 19;
+			sprite_map[x + y * map_width] = 19;
 		} else {
-			layer[x + y * layer_width] = 18;
+			sprite_map[x + y * map_width] = 18;
 		}
 	}
 }
 
 void flush_sprite_map(SpriteMap *sprite_map) {
 
-	for (int layer_index = 0; layer_index < sprite_map->layer_count; layer_index++) {
+	// copy sheet_map into sprite_map
+	memcpy(sprite_map->sprite_map, sprite_map->sheet_map, sizeof(int) * sprite_map->map_width * sprite_map->map_height);
 
-		// modify the layer to have TRUE only for values in map that match layer_index (which is 1-indexed)
-		for (int i = 0; i < sprite_map->map_width * sprite_map->map_height; i++) {
+	// convert sprite_map from housing sprite sheet index data to smooth sprite connections
+	for (int x = 0; x < sprite_map->map_width; x++) {
+		for (int y = 0; y < sprite_map->map_height; y++) {
 
-			sprite_map->layers[layer_index][i] = sprite_map->map[i] == layer_index + 1;
-		}
-
-		// modify the layer to go from binary TRUE/FALSE to properly indexing the sprite sheet for smooth sprite connections
-		for (int x = 0; x < sprite_map->map_width; x++) {
-			for (int y = 0; y < sprite_map->map_height; y++) {
-
-				smooth_sprite_in_layer(sprite_map->layers[layer_index], sprite_map->map_width, sprite_map->map_height, x, y);
-			}
+			smooth_sprite_in_sprite_map(sprite_map->sprite_map, sprite_map->map_width, sprite_map->map_height, x, y);
 		}
 	}
 }
@@ -319,33 +313,30 @@ SpriteMap *create_sprite_map(int sprite_width, int sprite_height, int map_width,
 
 	SpriteMap *sprite_map = malloc(sizeof(SpriteMap));
 
-	sprite_map->layer_count = 0;
-
-	sprite_map->layers 			= malloc(0);
-	sprite_map->sprite_sheets 	= malloc(0);
+	sprite_map->sprite_sheets = malloc(0);
+	sprite_map->sprite_sheet_count = 0;
 
 	sprite_map->sprite_width = sprite_width;
 	sprite_map->sprite_height = sprite_height;
 
 	sprite_map->map_width = map_width;
 	sprite_map->map_height = map_height;
-	sprite_map->map = calloc(map_width * map_height, sizeof(int));
+
+	sprite_map->sheet_map  = calloc(map_width * map_height, sizeof(int));
+	sprite_map->sprite_map = calloc(map_width * map_height, sizeof(int));
 
 	return sprite_map;
 }
 
-void add_layer_to_sprite_map(SpriteMap *sprite_map, const char *sprite_sheet_path) {
+void add_sprite_sheet_to_sprite_map(SpriteMap *sprite_map, const char *sprite_sheet_path) {
 
-	sprite_map->layer_count++;
+	sprite_map->sprite_sheet_count++;
 
-	sprite_map->layers 			= realloc(sprite_map->layers, 			sizeof(int *) 			* sprite_map->layer_count);
-	sprite_map->sprite_sheets 	= realloc(sprite_map->sprite_sheets, 	sizeof(SpriteSheet *) 	* sprite_map->layer_count);
+	// make space for this SpriteSheet
+	sprite_map->sprite_sheets = realloc(sprite_map->sprite_sheets, sizeof(SpriteSheet *) * sprite_map->sprite_sheet_count);
 
-	// create a layer the size of the map
-	sprite_map->layers[sprite_map->layer_count - 1] = malloc(sizeof(int) * sprite_map->map_width * sprite_map->map_height);
-
-	// load the SpriteSheet for this layer
-	sprite_map->sprite_sheets[sprite_map->layer_count - 1] = load_sprite_sheet(sprite_sheet_path, sprite_map->sprite_width, sprite_map->sprite_height);
+	// load the SpriteSheet
+	sprite_map->sprite_sheets[sprite_map->sprite_sheet_count - 1] = load_sprite_sheet(sprite_sheet_path, sprite_map->sprite_width, sprite_map->sprite_height);
 }
 
 void draw_sprite_map(SpriteMap *sprite_map, int x, int y) {
@@ -362,18 +353,18 @@ void draw_sprite_map(SpriteMap *sprite_map, int x, int y) {
 	for (int i = i_start; i < i_end; i++) {
 		for (int j = j_start; j < j_end; j++) {
 
-			int layer_index = sprite_map->map[i + j * sprite_map->map_width];
+			int sheet = sprite_map->sheet_map[i + j * sprite_map->map_width];
 
-			if (layer_index == 0)
+			if (sheet == 0)
 				continue;
 
-			layer_index--; // since layers are 1-indexed (0 is no render)
+			sheet--; // since sprite sheets are 1-indexed (0 is no render)
 		
 			draw_sprite_from_sheet(
-				sprite_map->sprite_sheets[layer_index],
-				sprite_map->layers[layer_index][i + j * sprite_map->map_width],
-				x + i * sprite_map->sprite_sheets[layer_index]->sprite_w,
-				y + j * sprite_map->sprite_sheets[layer_index]->sprite_h,
+				sprite_map->sprite_sheets[sheet],
+				sprite_map->sprite_map[i + j * sprite_map->map_width],
+				x + i * sprite_map->sprite_width,
+				y + j * sprite_map->sprite_height,
 				FALSE
 			);
 		}
@@ -382,17 +373,16 @@ void draw_sprite_map(SpriteMap *sprite_map, int x, int y) {
 
 void free_sprite_map(SpriteMap *sprite_map) {
 
-	// free map
-	free(sprite_map->map);
+	// free maps
+	free(sprite_map->sheet_map);
+	free(sprite_map->sprite_map);
 
-	// free all layers and their respective sprite sheets
-	for (int i = 0; i < sprite_map->layer_count; i++) {
+	// free all sprite sheets
+	for (int i = 0; i < sprite_map->sprite_sheet_count; i++) {
 
-		free(sprite_map->layers[i]);
 		free_sprite_sheet(sprite_map->sprite_sheets[i]);
 	}
 
-	free(sprite_map->layers);
 	free(sprite_map->sprite_sheets);
 
 	// free the sprite map

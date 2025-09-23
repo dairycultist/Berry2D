@@ -62,21 +62,22 @@ void free_sprite_sheet(SpriteSheet *sprite_sheet);
 
 typedef struct {
 
-	int layer_count;
-	int **layers; // stores what sprite within a sprite sheet to use (each array shares an index with the sprite sheet it indexes into)
 	SpriteSheet **sprite_sheets; // sprite sheet for each layer (all need to have sprites that are the same size, or else undefined behaviour)
+	int sprite_sheet_count;
 
 	int sprite_width;
 	int sprite_height;
 
 	int map_width;
 	int map_height;
-	int *map; // stores what layer (+ sprite sheet) to use at each position
+
+	int *sheet_map; // stores what sprite_sheet to use at each position
+	int *sprite_map; // stores what sprite within a sprite sheet to use (independent of layer) (may have to rename since it shares a name with SpriteMap...)
 
 } SpriteMap;
 
 SpriteMap *create_sprite_map(int sprite_width, int sprite_height, int map_width, int map_height);
-void add_layer_to_sprite_map(SpriteMap *sprite_map, const char *sprite_sheet_path);
+void add_sprite_sheet_to_sprite_map(SpriteMap *sprite_map, const char *sprite_sheet_path);
 void draw_sprite_map(SpriteMap *sprite_map, int x, int y);
 void flush_sprite_map(SpriteMap *sprite_map); // if you update ->map, you need to flush the changes so they're reflected in the layers (which determine what's drawn)
 void free_sprite_map(SpriteMap *sprite_map);

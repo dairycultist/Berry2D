@@ -55,11 +55,11 @@ void init_level() { // TODO pass filepath corresponding to level data
 	// initialize SpriteMap representing the level
 	level = create_sprite_map(16, 16, LEVEL_WIDTH, LEVEL_HEIGHT);
 
-	add_layer_to_sprite_map(level, "res/ground.png");
-	add_layer_to_sprite_map(level, "res/brick.png");
-	add_layer_to_sprite_map(level, "res/brick_broken.png");
+	add_sprite_sheet_to_sprite_map(level, "res/ground.png");
+	add_sprite_sheet_to_sprite_map(level, "res/brick.png");
+	add_sprite_sheet_to_sprite_map(level, "res/brick_broken.png");
 
-	memcpy(level->map, map, sizeof(map));
+	memcpy(level->sheet_map, map, sizeof(map));
 
 	flush_sprite_map(level);
 }
@@ -77,12 +77,12 @@ static int aabb_collides(int w, int h, int x, int y) {
 	if (y < 0 || y + h >= level->map_height * 16)
 		return 0;
 
-	return IS_SOLID(level->map[x / 16 + y / 16 * level->map_width]) // top, left/right
-		|| IS_SOLID(level->map[(x + w) / 16 + y / 16 * level->map_width])
-		|| IS_SOLID(level->map[x / 16 + (y + h / 2) / 16 * level->map_width]) // middle, left/right (otherwise, you can slide between 1-tall terrain)
-		|| IS_SOLID(level->map[(x + w) / 16 + (y + h / 2) / 16 * level->map_width])
-		|| IS_SOLID(level->map[x / 16 + (y + h) / 16 * level->map_width]) // bottom, left/right
-		|| IS_SOLID(level->map[(x + w) / 16 + (y + h) / 16 * level->map_width]);
+	return IS_SOLID(level->sheet_map[x / 16 + y / 16 * level->map_width]) // top, left/right
+		|| IS_SOLID(level->sheet_map[(x + w) / 16 + y / 16 * level->map_width])
+		|| IS_SOLID(level->sheet_map[x / 16 + (y + h / 2) / 16 * level->map_width]) // middle, left/right (otherwise, you can slide between 1-tall terrain)
+		|| IS_SOLID(level->sheet_map[(x + w) / 16 + (y + h / 2) / 16 * level->map_width])
+		|| IS_SOLID(level->sheet_map[x / 16 + (y + h) / 16 * level->map_width]) // bottom, left/right
+		|| IS_SOLID(level->sheet_map[(x + w) / 16 + (y + h) / 16 * level->map_width]);
 }
 
 void process_level(unsigned long time, int input) {
@@ -144,11 +144,11 @@ void process_level(unsigned long time, int input) {
 			int index1 = (int) (player_x / level->sprite_width + 0.5 + (player_dx > 0 ? 1 : -1)) + (int) (player_y / level->sprite_height + 0.5) * level->map_width;
 			int index2 = index1 + level->map_width;
 
-			if (level->map[index1] == 2 && level->map[index2] == 2) {
+			if (level->sheet_map[index1] == 2 && level->sheet_map[index2] == 2) {
 
 				// destroy bricks
-				level->map[index1] = 3;
-				level->map[index2] = 3;
+				level->sheet_map[index1] = 3;
+				level->sheet_map[index2] = 3;
 				flush_sprite_map(level);
 
 			} else {
