@@ -163,15 +163,19 @@ void draw_level(unsigned long time, int input) {
 
 	if (time_of_last_grounded != time) {
 
+		// airborne
 		run_cycle_timer = 0.0;
 		player_sprite_index = 4;
 
 	} else if ((ABS(player_dx) < 0.2 && !PRESSED(LEFT, input) && !PRESSED(RIGHT, input)) || collided_horizontally) {
 
+		// not moving
 		run_cycle_timer = 0.0;
 		player_sprite_index = 0;
 
 	} else {
+
+		// running
 		run_cycle_timer += (ABS(player_dx) + 1) / 20;
 		
 		if (run_cycle_timer >= 4.0) {
@@ -179,6 +183,12 @@ void draw_level(unsigned long time, int input) {
 		}
 
 		player_sprite_index = run_cycle_timer < 3.0 ? 1 + (int) run_cycle_timer : 2;
+
+		// running AND charging
+		if (ABS(player_dx) > 2.2) {
+
+			player_sprite_index += 4;
+		}
 	}
 
 	draw_sprite_from_sheet(
@@ -190,5 +200,5 @@ void draw_level(unsigned long time, int input) {
 	);
 
 	// draw text
-    draw_text(font, "ARROW KEYS TO MOVE\nZ IS CONFIRM\nX IS CANCEL\nC IS MENU", 100, 20);
+    draw_text(font, "ARROW KEYS TO MOVE\nZ IS CONFIRM\nX IS CANCEL\nC IS MENU", 4, 4);
 }
