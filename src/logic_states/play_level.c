@@ -170,10 +170,7 @@ void process_level(unsigned long time, int input) {
 			// charge power (immediately start charging in direction you're inputing if not already, even when airborne!)
 			if (has_charge_power && ABS(player_dx) < MIN_CHARGE_SPEED && JUST_PRESSED(CONFIRM, input)) {
 
-				player_dx = MAX_RUN_SPEED * (PRESSED(LEFT, input) ? -1 : 1);
-
-				if (time_of_last_grounded == time)
-					player_dy -= 1.5;
+				player_dx = (MAX_RUN_SPEED + 0.5) * (PRESSED(LEFT, input) ? -1 : 1);
 			}
 
 		} else
