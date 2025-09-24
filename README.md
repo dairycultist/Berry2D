@@ -6,7 +6,7 @@ A platformer engine akin to [Super Mario Bros. Remastered](https://github.com/JH
 - modded player characters (allowing for stuff like [this](https://bsky.app/profile/honeyswells.bsky.social/post/3lz74rivjmk24))
 - level editor which exports level file
 
-next big milestone is probably a level editor, tho I still gotta work on a level file format, arbitrary entity system (particles + enemies), parallax system (maybe part of entity system? render order...), ending a level, and a menu system as well.
+next big milestone is probably a level editor, tho I still gotta work on a level file format, arbitrary entity system (particles + enemies + charge trail + items), parallax system (maybe part of entity system? render order...), ending a level, and a menu system as well.
 
 ## Installation
 

@@ -41,8 +41,6 @@ int main() {
 
 	char running = TRUE;
 
-	unsigned long time = 0; // wraps to 0 at around 4.5 years
-
 	int input = 0; // at least 16 bytes, aka 8 pairs of 'pressed?' and 'just changed?' flags (their positions are specified in window.h)
 
 	while (running) {
@@ -105,7 +103,7 @@ int main() {
 		SDL_SetRenderTarget(renderer, screen_buffer); 						// set render target to screen_buffer
 		SDL_SetRenderDrawColor(renderer, clear_r, clear_g, clear_b, 255); 	// clear screen_buffer to clear color (default black)
 		SDL_RenderClear(renderer);
-		process(time++, input); 											// let the programmer do logic/render stuff to screen_buffer
+		process(input); 													// let the programmer do logic/render stuff to screen_buffer
 		SDL_SetRenderTarget(renderer, NULL); 								// reset render target back to window
 		SDL_RenderCopy(renderer, screen_buffer, NULL, &letterbox); 			// render screen_buffer
 		SDL_RenderPresent(renderer); 										// present rendered content to screen

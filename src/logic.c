@@ -6,19 +6,21 @@
 
 static bool paused = FALSE;
 
+static unsigned long time = 0; // wraps to 0 at around 4.5 years
+
 void init() {
 
 	init_level();
 }
 
-void process(unsigned long time, int input) {
+void process(int input) {
 
 	if (JUST_PRESSED(MENU, input)) {
 		paused = !paused;
 	}
 
 	if (!paused)
-    	process_level(time, input);
+    	process_level(++time, input);
 
 	draw_level(time, input);
 

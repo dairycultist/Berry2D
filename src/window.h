@@ -93,6 +93,6 @@ void free_sprite_map(SpriteMap *sprite_map);
 
 // implemented in logic.c
 void init();
-void process(unsigned long time, int input);
+void process(int input); // MAYBE add double delta_time
 
 #endif

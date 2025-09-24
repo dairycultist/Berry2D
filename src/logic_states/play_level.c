@@ -161,9 +161,17 @@ void process_level(unsigned long time, int input) {
 
 	} else {
 
+		// animation
+		run_cycle_timer += (ABS(player_dx) + 1) / 20;
+	
+		if (run_cycle_timer >= 4.0) {
+			run_cycle_timer -= 4.0;
+		}
+
 		// running
 		if (PRESSED(LEFT, input) ^ PRESSED(RIGHT, input)) {
 
+			// update velocity
 			player_dx = player_dx * SLIPPERINESS + MAX_RUN_SPEED * (1.0 - SLIPPERINESS) * (PRESSED(LEFT, input) ? -1 : 1);
 			flipped = PRESSED(LEFT, input);
 
@@ -268,13 +276,7 @@ void draw_level(unsigned long time, int input) {
 		run_cycle_timer = 0.0;
 		player_sprite_index = 0;
 
-	} else {
-
-		run_cycle_timer += (ABS(player_dx) + 1) / 20;
-		
-		if (run_cycle_timer >= 4.0) {
-			run_cycle_timer -= 4.0;
-		}
+	} else if (ABS(player_dx) >= 0.2) {
 
 		// running AND charging
 		if (ABS(player_dx) > MIN_CHARGE_SPEED) {
