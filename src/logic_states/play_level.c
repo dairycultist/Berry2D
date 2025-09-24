@@ -276,7 +276,7 @@ void draw_level(unsigned long time, int input) {
 		run_cycle_timer = 0.0;
 		player_sprite_index = 0;
 
-	} else if (ABS(player_dx) >= 0.2) {
+	} else {
 
 		// running AND charging
 		if (ABS(player_dx) > MIN_CHARGE_SPEED) {

@@ -22,7 +22,7 @@ void process(int input) {
 	if (!paused)
     	process_level(++time, input);
 
-	draw_level(time, input);
+	draw_level(time, paused ? 0 : input);
 
 	if (paused)
 		draw_text(font, "PAUSED", WIDTH / 2 - 18, HEIGHT / 2 - 3);
