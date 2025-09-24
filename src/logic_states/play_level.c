@@ -11,7 +11,7 @@ static float player_dx = 0, player_dy = 0;
 
 static bool flipped = FALSE;
 static bool crouched = FALSE;
-static bool has_charge_power = TRUE;
+static bool has_charge_power = FALSE;
 static float run_cycle_timer;
 
 static unsigned long time_of_last_pressed_jump = -100000; // game starts at time=0, if this starts at 0 then we will jump at game start
@@ -99,6 +99,10 @@ static int aabb_collides(int w, int h, int x, int y) {
 
 void process_level(unsigned long time, int input) {
 
+	// TEMP toggle between having and not having charge power with cancel
+	if (JUST_PRESSED(CANCEL, input))
+		has_charge_power = !has_charge_power;
+
 	// crouch input
 	if (JUST_PRESSED(DOWN, input)) {
 		crouched = TRUE;
@@ -163,11 +167,13 @@ void process_level(unsigned long time, int input) {
 			player_dx = player_dx * SLIPPERINESS + MAX_RUN_SPEED * (1.0 - SLIPPERINESS) * (PRESSED(LEFT, input) ? -1 : 1);
 			flipped = PRESSED(LEFT, input);
 
-			// charge power (immediately start charging if not already, even when airborne!)
+			// charge power (immediately start charging in direction you're inputing if not already, even when airborne!)
 			if (has_charge_power && ABS(player_dx) < MIN_CHARGE_SPEED && JUST_PRESSED(CONFIRM, input)) {
 
 				player_dx = MAX_RUN_SPEED * (PRESSED(LEFT, input) ? -1 : 1);
-				player_dy -= 1.5;
+
+				if (time_of_last_grounded == time)
+					player_dy -= 1.5;
 			}
 
 		} else
@@ -284,6 +290,9 @@ void draw_level(unsigned long time, int input) {
 			player_sprite_index = run_cycle_timer < 3.0 ? 1 + (int) run_cycle_timer : 2;
 		}
 	}
+
+	if (has_charge_power)
+		player_sprite_index += 8;
 
 	draw_sprite_from_sheet(
 		player_sprite,
