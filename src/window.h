@@ -11,9 +11,9 @@ typedef int bool;
 #define TRUE 1
 #define FALSE 0
 
-// screen size
-#define WIDTH 320
-#define HEIGHT 200
+// screen size (384 × 240; 8:5)
+#define WIDTH 384
+#define HEIGHT 240
 #define ASPECT_RATIO (WIDTH / (float) HEIGHT)
 
 // input bitwise operations
