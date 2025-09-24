@@ -12,7 +12,9 @@ static float player_dx = 0, player_dy = 0;
 static bool flipped = FALSE;
 static bool crouched = FALSE;
 static bool has_charge_power = FALSE;
+
 static float run_cycle_timer;
+static int player_sprite_index;
 
 static unsigned long time_of_last_pressed_jump = -100000; // game starts at time=0, if this starts at 0 then we will jump at game start
 static unsigned long time_of_last_jump;
@@ -261,16 +263,10 @@ void process_level(unsigned long time, int input) {
 
 	while (player_middle_pos + camera_x >= 20 && camera_x > 0) { camera_x--; }
 	while (player_middle_pos + camera_x <= -20 && camera_x < LEVEL_WIDTH * level->sprite_width - WIDTH) { camera_x++; }
-}
 
-void draw_level(unsigned long time, int input) {
-
-	// draw level sprite map
-	draw_sprite_map(level, -camera_x, 0);
-
-	// render player (currently determining animation frame here, should ideally do that in process)
-	int player_sprite_index = 0;
-
+	/*
+	 * determine animation frame
+	 */
 	if (crouched) {
 
 		// crouching
@@ -281,11 +277,6 @@ void draw_level(unsigned long time, int input) {
 		// airborne
 		run_cycle_timer = 0.0;
 		player_sprite_index = 4;
-
-		// airborne AND charging
-		if (ABS(player_dx) > MIN_CHARGE_SPEED) {
-			player_sprite_index = 6;
-		}
 
 	} else if ((ABS(player_dx) < 0.2 && !PRESSED(LEFT, input) && !PRESSED(RIGHT, input)) || collided_horizontally) {
 
@@ -309,7 +300,14 @@ void draw_level(unsigned long time, int input) {
 
 	if (has_charge_power)
 		player_sprite_index += 8;
+}
 
+void draw_level(unsigned long time) {
+
+	// draw level sprite map
+	draw_sprite_map(level, -camera_x, 0);
+
+	// render player
 	draw_sprite_from_sheet(
 		player_sprite,
 		player_sprite_index,
