@@ -22,6 +22,11 @@ static bool collided_horizontally;
 #define MAX_RUN_SPEED 2.5
 #define MIN_CHARGE_SPEED 2.2
 #define SLIPPERINESS 0.97
+#define JUMP_SPEED -3.0
+
+#define DEFAULT_GRAVITY 0.15
+#define FAST_FALL_GRAVITY 0.25
+#define HIGH_JUMP_GRAVITY 0.04
 
 #define LEVEL_WIDTH 400
 #define LEVEL_HEIGHT 15
@@ -51,9 +56,8 @@ static int map[LEVEL_WIDTH * LEVEL_HEIGHT] = {
 	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 };
 
-void init_level() { // TODO pass filepath corresponding to level data (map + sprite sheet to use for each "tile type")
+void init_level() { // TODO pass filepath corresponding to level data (map + sprite sheet path to use for each "tile type")
 
-	// obvious stuff
 	player_sprite = load_sprite_sheet("res/char.png", 16, 32);
     font = load_sprite_sheet("res/font.png", 6, 6);
 	set_clear_color(100, 180, 255);
@@ -99,6 +103,10 @@ static int aabb_collides(int w, int h, int x, int y) {
 
 void process_level(unsigned long time, int input) {
 
+	/*
+	 * static player state changes
+	 */
+
 	// TEMP toggle between having and not having charge power with cancel
 	if (JUST_PRESSED(CANCEL, input))
 		has_charge_power = !has_charge_power;
@@ -113,8 +121,8 @@ void process_level(unsigned long time, int input) {
 	// calculate bounding box
 	int player_aabb_yoff = crouched ? (STANDING_HEIGHT - CROUCHING_HEIGHT) : 0;
 	int player_aabb_h    = crouched ? CROUCHING_HEIGHT : STANDING_HEIGHT;
-	
-    if (JUST_PRESSED(UP, input)) {
+
+	if (JUST_PRESSED(UP, input)) {
 
 		// register a jump at this time
 		time_of_last_pressed_jump = time;
@@ -126,25 +134,34 @@ void process_level(unsigned long time, int input) {
 		time_of_last_grounded = time;
 	}
 
+	/*
+	 * update player velocity
+	 */
+
 	// if recently pressed jump (input caching) AND recently was on ground (coyote time), jump
 	if (time - time_of_last_pressed_jump < 10 && time - time_of_last_grounded < 10) {
 
-		player_dy = -3.0;
+		player_dy = JUMP_SPEED;
 		time_of_last_jump = time;
 		time_of_last_grounded = 0;
 	}
 
 	// gravity (if recently jumped, make gravity lesser if holding jump, otherwise greater)
 	// ("recently jumped" is longer the faster you're running)
+	// TODO stop hardcoding these values
 	if ((time - time_of_last_jump) < 10 + ABS(player_dx) * 4) {
 
 		if (PRESSED(UP, input)) {
-			player_dy += 0.04;
+			player_dy += HIGH_JUMP_GRAVITY;
 		} else {
-			player_dy += 0.25;
+			player_dy += FAST_FALL_GRAVITY;
 		}
 	} else {
-		player_dy += 0.15;
+
+		if (PRESSED(DOWN, input)) {
+			player_dy += FAST_FALL_GRAVITY;
+		} else
+			player_dy += DEFAULT_GRAVITY;
 	}
 
 	if (crouched) {
@@ -184,6 +201,10 @@ void process_level(unsigned long time, int input) {
 		} else
 			player_dx *= SLIPPERINESS;
 	}
+
+	/*
+	 * apply player velocity
+	 */
 
 	// move player w/ collision
 	collided_horizontally = FALSE;
@@ -239,7 +260,9 @@ void process_level(unsigned long time, int input) {
 		player_y = 148;
 	}
 
-	// update camera
+	/*
+	 * update camera
+	 */
 	int player_middle_pos = WIDTH / 2 - ((int) player_x + 8);
 
 	while (player_middle_pos + camera_x >= 20 && camera_x > 0) { camera_x--; }
