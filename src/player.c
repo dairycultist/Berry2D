@@ -3,6 +3,18 @@
 
 #include "window.h"
 
+#define MAX_RUN_SPEED 2.5
+#define MIN_CHARGE_SPEED 2.2
+#define SLIPPERINESS 0.97
+#define JUMP_SPEED -3.0
+
+#define STANDING_HEIGHT 28
+#define CROUCHING_HEIGHT 15
+
+#define DEFAULT_GRAVITY 0.15
+#define FAST_FALL_GRAVITY 0.35
+#define HIGH_JUMP_GRAVITY 0.04
+
 #define ABS(x) ((x) > 0 ? (x) : -(x))
 
 static unsigned long time_of_last_pressed_jump = -100000; // game starts at time=0, if this starts at 0 then we will jump at game start
@@ -184,12 +196,6 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 				player->dy = 0;
 	}
 	player->y += player->dy;
-
-	// respawn if fell out of level
-	if (player->y > 16 * LEVEL_HEIGHT) {
-		player->x = 40;
-		player->y = 148;
-	}
 
 	/*
 	 * determine animation frame

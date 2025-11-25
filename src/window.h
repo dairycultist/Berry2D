@@ -26,9 +26,6 @@ typedef struct {
 
 } Input;
 
-// rendering datatypes and function prototypes
-void set_clear_color(unsigned char r, unsigned char g, unsigned char b);
-
 typedef struct {
 
     void *sdl_texture;
@@ -36,10 +33,6 @@ typedef struct {
     int h;
 
 } Sprite;
-
-Sprite *load_sprite(const char *path);
-void draw_sprite(Sprite *sprite, int x, int y, bool flip);
-void free_sprite(Sprite *sprite);
 
 typedef struct {
 
@@ -49,11 +42,6 @@ typedef struct {
     int sprites_per_row;
 
 } SpriteSheet;
-
-SpriteSheet *load_sprite_sheet(const char *path, int sprite_width, int sprite_height);
-void draw_sprite_from_sheet(SpriteSheet *sprite_sheet, int index, int x, int y, bool flip);
-void draw_text(SpriteSheet *sprite_sheet, char *text, int x, int y);
-void free_sprite_sheet(SpriteSheet *sprite_sheet);
 
 // defines sprite indexing behaviour in SpriteMap->sprite_map
 typedef enum {
@@ -79,32 +67,9 @@ typedef struct {
 
 } SpriteMap; // might rename to Grid or TileGrid since it shares a name with ->sprite_map
 
-SpriteMap *create_sprite_map(int sprite_width, int sprite_height, int map_width, int map_height);
-void add_sprite_sheet_to_sprite_map(SpriteMap *sprite_map, const char *sprite_sheet_path, SpriteSheetType sprite_sheet_type);
-void draw_sprite_map(SpriteMap *sprite_map, int x, int y);
-void flush_sprite_map(SpriteMap *sprite_map); // if you update ->sheet_map, you need to flush the changes so they're reflected in ->sprite_map
-void flush_sprite_map_at(int x, int y, SpriteMap *sprite_map);
-void free_sprite_map(SpriteMap *sprite_map);
-
-
 
 
 // player stuff
-#define MAX_RUN_SPEED 2.5
-#define MIN_CHARGE_SPEED 2.2
-#define SLIPPERINESS 0.97
-#define JUMP_SPEED -3.0
-
-#define DEFAULT_GRAVITY 0.15
-#define FAST_FALL_GRAVITY 0.35
-#define HIGH_JUMP_GRAVITY 0.04
-
-#define LEVEL_WIDTH 400
-#define LEVEL_HEIGHT 18
-
-#define STANDING_HEIGHT 28
-#define CROUCHING_HEIGHT 15
-
 typedef struct {
 
 	float  x,  y;
