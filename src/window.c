@@ -32,7 +32,7 @@ int main() {
 		return 1;
 	}
 
-	screen_buffer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, WIDTH, HEIGHT);
+	screen_buffer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_TARGET, WIDTH, HEIGHT);
 
 	if (!screen_buffer) {
 		printf("Error creating screen buffer:\n%s\n", SDL_GetError());
@@ -51,13 +51,13 @@ int main() {
 
 	while (running) {
 
-		input.up_justchanged    = 0;
-		input.down_justchanged  = 0;
-		input.left_justchanged  = 0;
-		input.right_justchanged = 0;
-		input.confirm_justchanged  = 0;
-		input.cancel_justchanged   = 0;
-		input.menu_justchanged     = 0;
+		input.up_justchanged      = 0;
+		input.down_justchanged    = 0;
+		input.left_justchanged    = 0;
+		input.right_justchanged   = 0;
+		input.confirm_justchanged = 0;
+		input.cancel_justchanged  = 0;
+		input.menu_justchanged    = 0;
 
 		while (SDL_PollEvent(&event)) {
 
@@ -206,36 +206,34 @@ void draw_text(SpriteSheet *sprite_sheet, char *text, int x, int y) {
 
 	while (*text) {
 
-		if (*text >= 'A' && *text <= 'Z') {
-
-			draw_sprite_from_sheet(sprite_sheet, *text - 65, x, y, FALSE);
-			x += sprite_sheet->sprite_w;
-		}
-
-		else if (*text == '!') {
-			draw_sprite_from_sheet(sprite_sheet, 26, x, y, FALSE);
-			x += sprite_sheet->sprite_w;
-		}
-
-		else if (*text == '?') {
-			draw_sprite_from_sheet(sprite_sheet, 27, x, y, FALSE);
-			x += sprite_sheet->sprite_w;
-		}
-
-		else if (*text >= '\'' && *text <= '/') {
-
-			draw_sprite_from_sheet(sprite_sheet, *text - 11, x, y, FALSE);
-			x += sprite_sheet->sprite_w;
-		}
-
-		else if (*text == '\n') {
+		if (*text == '\n') {
 
 			x = start_x;
 			y += sprite_sheet->sprite_h + 1; // + 1 for line height spacing
-		}
+			
+		} else if (*text == ' ') {
 
-		else if (*text == ' ') {
+			x += sprite_sheet->sprite_w;
 
+		} else {
+
+			int sprite_i;
+
+			if (*text >= 'A' && *text <= 'Z') {
+				sprite_i = *text - 65;
+			} else if (*text >= '0' && *text <= '9') {
+				sprite_i = *text - 10;
+			} else if (*text == ':') {
+				sprite_i = 37;
+			} else if (*text == '!') {
+				sprite_i = 26;
+			} else if (*text >= '\'' && *text <= '/') {
+				sprite_i = *text - 11;
+			} else {
+				sprite_i = 27; // all unrecognized characters map to ? (including actual ?)
+			}
+
+			draw_sprite_from_sheet(sprite_sheet, sprite_i, x, y, FALSE);
 			x += sprite_sheet->sprite_w;
 		}
 

@@ -328,7 +328,7 @@ void draw_level(unsigned long time) {
 	);
 
 	// draw text
-    draw_text(font, "ARROW KEYS TO MOVE\nZ IS CONFIRM, X IS CANCEL, C IS MENU.\n(WHAT'S THAT?! +-*/)", 4, 4);
+    draw_text(font, "ARROW KEYS TO MOVE\nCONFIRM: Z\nCANCEL:  X\nMENU:    C\n(WHAT'S THAT?! +-*/1234567890)", 4, 4);
 }
 
 
