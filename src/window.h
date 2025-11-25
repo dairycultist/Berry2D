@@ -1,6 +1,6 @@
 /*
- * window is an abstraction layer that implements I/O (keyboard input, rendering, audio, etc) and will call
- * two externally implemented functions (init and process) as appropriate
+ * window.c handles all game rendering, input tracking, and object management;
+ * player.c handles player logic agnostic to the above
  */
 
 #ifndef WINDOW_H
