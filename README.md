@@ -1,5 +1,14 @@
 # Berry2D (working title?)
 
+I wanna cut back the scope to just a single, dedicated game (which admittedly would probably be very easily modifiable)
+
+- "a couch co-op platformer game with decent movement and cute art would be so fun" (my own words bro; [look at this](https://fixvx.com/Hyohnoo/status/1993024148486926431?s=20))
+- clean up code (remove attempt at scenes, ensure code separation from window/renderer/IO)
+- 18 tiles tall with 4 ground tiles at the bottom
+- load levels from files that are just a big grid of numbers
+
+---
+
 A platformer engine akin to [Super Mario Bros. Remastered](https://github.com/JHDev2006/Super-Mario-Bros.-Remastered-Public).
 
 - base game with player characters and levels
