@@ -11,25 +11,20 @@ typedef int bool;
 #define TRUE 1
 #define FALSE 0
 
-// screen size (384 × 240; 8:5)
+// screen size
 #define WIDTH 384
-#define HEIGHT 240
+#define HEIGHT 288
 #define ASPECT_RATIO (WIDTH / (float) HEIGHT)
 
-// input bitwise operations
-#define JUST_CHANGED(key, input)    ((input) & (1 << (key - 1)))
-#define PRESSED(key, input)         ((input) & (1 << key))
-#define JUST_PRESSED(key, input)    (JUST_CHANGED(key, input) && PRESSED(key, input))
-#define RELEASED(key, input)        (!PRESSED(key, input))
-#define JUST_RELEASED(key, input)   (JUST_CHANGED(key, input) && !PRESSED(key, input))
+typedef struct {
 
-#define UP 15       // arrow keys
-#define DOWN 13
-#define LEFT 11
-#define RIGHT 9
-#define CONFIRM 7   // Z
-#define CANCEL 5    // X
-#define MENU 3      // C
+    int up, down, left, right;
+    int up_justchanged, down_justchanged, left_justchanged, right_justchanged;
+
+	int confirm, cancel, menu;
+	int confirm_justchanged, cancel_justchanged, menu_justchanged;
+
+} Input;
 
 // rendering datatypes and function prototypes
 void set_clear_color(unsigned char r, unsigned char g, unsigned char b);
@@ -93,6 +88,6 @@ void free_sprite_map(SpriteMap *sprite_map);
 
 // implemented in logic.c
 void init();
-void process(int input); // MAYBE add double delta_time
+void process(Input *input); // MAYBE add double delta_time
 
 #endif

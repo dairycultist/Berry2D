@@ -1,6 +1,6 @@
 .PHONY: run clean
 
-build: src/* src/*/*
+build: src/* res/*
 	gcc -o build src/*.c -lSDL2_image $(shell sdl2-config --cflags) $(shell sdl2-config --libs)
 
 run: build

@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+
 #include "window.h"
 
 static SDL_Window *window;
@@ -33,20 +34,30 @@ int main() {
 
 	screen_buffer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, WIDTH, HEIGHT);
 
+	if (!screen_buffer) {
+		printf("Error creating screen buffer:\n%s\n", SDL_GetError());
+		return 1;
+	}
+
 	init();
 
 	// process events until window is closed
 	SDL_Event event;
-	SDL_Rect letterbox = {0, 0, WIDTH * 2, HEIGHT * 2};
+	SDL_Rect letterbox = { 0, 0, WIDTH * 2, HEIGHT * 2 };
 
 	char running = TRUE;
 
-	int input = 0; // at least 16 bytes, aka 8 pairs of 'pressed?' and 'just changed?' flags (their positions are specified in window.h)
+	Input input = {};
 
 	while (running) {
 
-		// clear 'just changed?' flag of every input
-		input = input & 0b1010101010101010;
+		input.up_justchanged    = 0;
+		input.down_justchanged  = 0;
+		input.left_justchanged  = 0;
+		input.right_justchanged = 0;
+		input.confirm_justchanged  = 0;
+		input.cancel_justchanged   = 0;
+		input.menu_justchanged     = 0;
 
 		while (SDL_PollEvent(&event)) {
 
@@ -67,30 +78,34 @@ int main() {
 
 			} else if ((event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) && !event.key.repeat) {
 
-				// first operation is changing 'pressed?' flag, second 'just changed?' flag (cleared on next frame)
-				#define GET_INPUT_FROM_KEYSTATE(pressed, key) ((pressed ? input | (1 << key) : input & ~(1 << key)) | (1 << (key - 1)))
-
 				switch (event.key.keysym.scancode) {
 					case SDL_SCANCODE_UP:
-						input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, UP);
+						input.up = event.key.state == SDL_PRESSED;
+						input.up_justchanged = 1;
 						break;
 					case SDL_SCANCODE_DOWN:
-						input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, DOWN);
+						input.down = event.key.state == SDL_PRESSED;
+						input.down_justchanged = 1;
 						break;
 					case SDL_SCANCODE_LEFT:
-						input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, LEFT);
+						input.left = event.key.state == SDL_PRESSED;
+						input.left_justchanged = 1;
 						break;
 					case SDL_SCANCODE_RIGHT:
-						input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, RIGHT);
+						input.right = event.key.state == SDL_PRESSED;
+						input.right_justchanged = 1;
 						break;
 					case SDL_SCANCODE_Z:
-						input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, CONFIRM);
+						input.confirm = event.key.state == SDL_PRESSED;
+						input.confirm_justchanged = 1;
 						break;
 					case SDL_SCANCODE_X:
-						input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, CANCEL);
+						input.cancel = event.key.state == SDL_PRESSED;
+						input.cancel_justchanged = 1;
 						break;
 					case SDL_SCANCODE_C:
-						input = GET_INPUT_FROM_KEYSTATE(event.key.state == SDL_PRESSED, MENU);
+						input.menu = event.key.state == SDL_PRESSED;
+						input.menu_justchanged = 1;
 						break;
 					default:
 						break;
@@ -103,7 +118,7 @@ int main() {
 		SDL_SetRenderTarget(renderer, screen_buffer); 						// set render target to screen_buffer
 		SDL_SetRenderDrawColor(renderer, clear_r, clear_g, clear_b, 255); 	// clear screen_buffer to clear color (default black)
 		SDL_RenderClear(renderer);
-		process(input); 													// let the programmer do logic/render stuff to screen_buffer
+		process(&input); 													// let the programmer do logic/render stuff to screen_buffer
 		SDL_SetRenderTarget(renderer, NULL); 								// reset render target back to window
 		SDL_RenderCopy(renderer, screen_buffer, NULL, &letterbox); 			// render screen_buffer
 		SDL_RenderPresent(renderer); 										// present rendered content to screen
