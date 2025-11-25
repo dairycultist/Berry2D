@@ -86,8 +86,38 @@ void flush_sprite_map(SpriteMap *sprite_map); // if you update ->sheet_map, you 
 void flush_sprite_map_at(int x, int y, SpriteMap *sprite_map);
 void free_sprite_map(SpriteMap *sprite_map);
 
-// implemented in logic.c
-void init();
-void process(Input *input); // MAYBE add double delta_time
+
+
+
+// player stuff
+#define MAX_RUN_SPEED 2.5
+#define MIN_CHARGE_SPEED 2.2
+#define SLIPPERINESS 0.97
+#define JUMP_SPEED -3.0
+
+#define DEFAULT_GRAVITY 0.15
+#define FAST_FALL_GRAVITY 0.35
+#define HIGH_JUMP_GRAVITY 0.04
+
+#define LEVEL_WIDTH 400
+#define LEVEL_HEIGHT 18
+
+#define STANDING_HEIGHT 28
+#define CROUCHING_HEIGHT 15
+
+typedef struct {
+
+	float  x,  y;
+	float dx, dy;
+
+	bool flipped;
+	bool crouched;
+	bool has_charge_power;
+
+	int sprite_index;
+
+} Player;
+
+void process_player(unsigned long time, Input *input, Player *player, SpriteMap *level);
 
 #endif
