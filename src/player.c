@@ -15,7 +15,7 @@
 #define HIGH_JUMP_GRAVITY 0.04
 
 #define ACCELERATION 0.02
-#define DECELERATION 0.95
+#define DECELERATION 0.07
 
 #define ABS(x) ((x) > 0 ? (x) : -(x))
 
@@ -117,7 +117,7 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 			player->flipped = input->left;
 
 		} else {
-			speed_fac *= DECELERATION;
+			speed_fac *= 1 - DECELERATION;
 		}
 
 	} else {
@@ -136,7 +136,7 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 			player->flipped = input->left;
 
 		} else {
-			speed_fac *= DECELERATION;
+			speed_fac *= 1 - DECELERATION;
 		}
 	}
 
