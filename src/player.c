@@ -4,7 +4,6 @@
 #include "window.h"
 
 #define MAX_RUN_SPEED 2.5
-#define MIN_CHARGE_SPEED 2.2
 #define SLIPPERINESS 0.97
 #define JUMP_SPEED -3.0
 
@@ -26,7 +25,7 @@ static float run_cycle_timer;
 
 static inline int point_collides(SpriteMap *level, int x, int y) {
 
-	#define IS_SOLID(sheet) ((sheet) != 0 && (sheet) != 4)
+	#define IS_SOLID(sheet) ((sheet) != 0)
 
 	if (x < 0 || x >= level->map_width * 16)
 		return 1;
@@ -175,7 +174,12 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 
 		// airborne
 		run_cycle_timer = 0.0;
-		player->sprite_index = 4;
+
+		if (ABS(player->dx) >= MAX_RUN_SPEED - 0.1) {
+			player->sprite_index = 8;
+		} else {
+			player->sprite_index = 4;
+		}
 
 	} else if ((ABS(player->dx) < 0.2 && !input->left && !input->right) || collided_horizontally) {
 
@@ -185,8 +189,8 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 
 	} else {
 
-		// running AND charging
-		if (ABS(player->dx) > MIN_CHARGE_SPEED) {
+		// running at top speed
+		if (ABS(player->dx) >= MAX_RUN_SPEED - 0.1) {
 
 			player->sprite_index = 5 + ((int) run_cycle_timer) % 2;
 
