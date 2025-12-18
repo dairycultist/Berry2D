@@ -77,7 +77,6 @@ typedef struct {
 
 	bool flipped;
 	bool crouched;
-	bool has_charge_power;
 
 	int sprite_index;
 

@@ -56,10 +56,6 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 	 * static player state changes
 	 */
 
-	// TEMP toggle between having and not having charge power with cancel
-	if (input->cancel && input->cancel_justchanged)
-		player->has_charge_power = !player->has_charge_power;
-
 	// crouch input
 	if (input->down && input->down_justchanged) {
 		player->crouched = TRUE;
@@ -98,7 +94,7 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 	// gravity (if recently jumped, make gravity lesser if holding jump, otherwise greater)
 	// ("recently jumped" is longer the faster you're running)
 	// TODO stop hardcoding these values
-	if ((time - time_of_last_jump) < 10 + ABS(player->dx) * 4) {
+	if ((time - time_of_last_jump) < 14 + ABS(player->dx) * 4) {
 
 		player->dy += input->up ? HIGH_JUMP_GRAVITY : FAST_FALL_GRAVITY;
 
@@ -135,12 +131,6 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 			player->dx = player->dx * SLIPPERINESS + MAX_RUN_SPEED * (1.0 - SLIPPERINESS) * (input->left ? -1 : 1);
 			player->flipped = input->left;
 
-			// charge power (immediately start charging in direction you're inputing if not already, even when airborne!)
-			if (player->has_charge_power && ABS(player->dx) < MIN_CHARGE_SPEED && input->confirm && input->confirm_justchanged) {
-
-				player->dx = (MAX_RUN_SPEED + 0.5) * (input->left ? -1 : 1);
-			}
-
 		} else
 			player->dx *= SLIPPERINESS;
 	}
@@ -152,40 +142,16 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 	// move player w/ collision
 	collided_horizontally = FALSE;
 
-	// charging while grounded (and not crouching); instead of stopping horizontally on wall collision, you bounce back + up
-	if (!player->crouched && ABS(player->dx) > MIN_CHARGE_SPEED && aabb_collides(level, 16, STANDING_HEIGHT, player->x, player->y + 1.0)) {
-
-		if (aabb_collides(level, 16, STANDING_HEIGHT, player->x + player->dx, player->y)) {
-
-			int index1 = (int) (player->x / level->sprite_width + 0.5 + (player->dx > 0 ? 1 : -1)) + (int) (player->y / level->sprite_height + 0.5) * level->map_width;
-			int index2 = index1 + level->map_width;
-
-			if (level->sheet_map[index1] == 2 && level->sheet_map[index2] == 2) {
-
-				// destroy destructable blocks (sheet index 2)
-				level->sheet_map[index1] = 0;
-				level->sheet_map[index2] = 0;
-
-			} else {
-
-				// bounce
-				player->dx *= -1;
-				player->dy -= 1.5;
-			}
-		}
-
 	// prevent player from moving horizontally through a wall
-	} else {
+	while (aabb_collides(level, 16, player_aabb_h, player->x + player->dx, player->y + player_aabb_yoff)) {
 
-		while (aabb_collides(level, 16, player_aabb_h, player->x + player->dx, player->y + player_aabb_yoff)) {
+		player->dx *= 0.7;
+		collided_horizontally = TRUE;
 
-			player->dx *= 0.7;
-			collided_horizontally = TRUE;
-
-			if (ABS(player->dx) < 0.1)
-				player->dx = 0;
-		}
+		if (ABS(player->dx) < 0.1)
+			player->dx = 0;
 	}
+	
 	player->x += player->dx;
 
 	while (aabb_collides(level, 16, player_aabb_h, player->x, player->y + player_aabb_yoff + player->dy)) {
@@ -230,7 +196,4 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 			player->sprite_index = run_cycle_timer < 3.0 ? 1 + (int) run_cycle_timer : 2;
 		}
 	}
-
-	if (player->has_charge_power)
-		player->sprite_index += 8;
 }
