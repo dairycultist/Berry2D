@@ -4,7 +4,7 @@
 #include "window.h"
 
 #define MAX_RUN_SPEED 2.5
-#define SLIPPERINESS 0.97
+#define SLIPPERINESS 0.95
 #define JUMP_SPEED -3.0
 
 #define STANDING_HEIGHT 28
@@ -14,14 +14,18 @@
 #define FAST_FALL_GRAVITY 0.35
 #define HIGH_JUMP_GRAVITY 0.04
 
+#define ACCELERATION 0.02
+#define DECELERATION 0.95
+
 #define ABS(x) ((x) > 0 ? (x) : -(x))
 
 static unsigned long time_of_last_pressed_jump = -100000; // game starts at time=0, if this starts at 0 then we will jump at game start
 static unsigned long time_of_last_jump;
 static unsigned long time_of_last_grounded;
-static bool collided_horizontally;
 
 static float run_cycle_timer;
+
+static float speed_fac; // 0..1
 
 static inline int point_collides(SpriteMap *level, int x, int y) {
 
@@ -93,7 +97,7 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 	// gravity (if recently jumped, make gravity lesser if holding jump, otherwise greater)
 	// ("recently jumped" is longer the faster you're running)
 	// TODO stop hardcoding these values
-	if ((time - time_of_last_jump) < 14 + ABS(player->dx) * 4) {
+	if ((time - time_of_last_jump) < 14 + speed_fac * 10) {
 
 		player->dy += input->up ? HIGH_JUMP_GRAVITY : FAST_FALL_GRAVITY;
 
@@ -108,16 +112,18 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 		if (input->left ^ input->right) {
 
 			if (time_of_last_grounded != time)
-				player->dx = player->dx * SLIPPERINESS + MAX_RUN_SPEED * (1.0 - SLIPPERINESS) * (input->left ? -1 : 1);
-			player->flipped = input->left;
-		}
+				speed_fac = (speed_fac - 1) * (1 - ACCELERATION) + 1;
 
-		player->dx *= SLIPPERINESS; // punish the player for crouch jumping by making it always drag, even when inputing >:)
+			player->flipped = input->left;
+
+		} else {
+			speed_fac *= DECELERATION;
+		}
 
 	} else {
 
 		// running animation
-		run_cycle_timer += (ABS(player->dx) + 1) / 20;
+		run_cycle_timer += (speed_fac + 1) / 15;
 	
 		if (run_cycle_timer >= 4.0) {
 			run_cycle_timer -= 4.0;
@@ -126,20 +132,30 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 		// running
 		if (input->left ^ input->right) {
 
-			// update velocity
-			player->dx = player->dx * SLIPPERINESS + MAX_RUN_SPEED * (1.0 - SLIPPERINESS) * (input->left ? -1 : 1);
+			speed_fac = (speed_fac - 1) * (1 - ACCELERATION) + 1;
 			player->flipped = input->left;
 
-		} else
-			player->dx *= SLIPPERINESS;
+		} else {
+			speed_fac *= DECELERATION;
+		}
 	}
+
+	// clamp speed fac
+	if (speed_fac > 1)
+		speed_fac = 1;
+
+	if (speed_fac < 0)
+		speed_fac = 0;
+
+	// update velocity
+	player->dx = player->dx * SLIPPERINESS + (player->flipped ? -1 : 1) * speed_fac * MAX_RUN_SPEED * (1 - SLIPPERINESS);
 
 	/*
 	 * apply player velocity
 	 */
 
 	// move player w/ collision
-	collided_horizontally = FALSE;
+	bool collided_horizontally = FALSE;
 
 	// prevent player from moving horizontally through a wall
 	while (aabb_collides(level, 16, player_aabb_h, player->x + player->dx, player->y + player_aabb_yoff)) {
@@ -147,8 +163,10 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 		player->dx *= 0.7;
 		collided_horizontally = TRUE;
 
-		if (ABS(player->dx) < 0.1)
+		if (ABS(player->dx) < 0.1) {
+			speed_fac = 0;
 			player->dx = 0;
+		}
 	}
 	
 	player->x += player->dx;
@@ -158,7 +176,7 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 		player->dy *= 0.7;
 
 		if (ABS(player->dy) < 0.1)
-				player->dy = 0;
+			player->dy = 0;
 	}
 	player->y += player->dy;
 
@@ -175,7 +193,7 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 		// airborne
 		run_cycle_timer = 0.0;
 
-		if (ABS(player->dx) >= MAX_RUN_SPEED - 0.1) {
+		if (speed_fac > 0.99) {
 			player->sprite_index = 8;
 		} else {
 			player->sprite_index = 4;
@@ -190,7 +208,7 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 	} else {
 
 		// running at top speed
-		if (ABS(player->dx) >= MAX_RUN_SPEED - 0.1) {
+		if (speed_fac > 0.99) {
 
 			player->sprite_index = 5 + ((int) run_cycle_timer) % 2;
 
