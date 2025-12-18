@@ -109,16 +109,17 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 	if (player->crouched) {
 
 		// crouch jumping
-		if (input->left ^ input->right) {
+		if (time_of_last_grounded != time) {
 
-			if (time_of_last_grounded != time)
+			if (input->left ^ input->right)
 				speed_fac = (speed_fac - 1) * (1 - ACCELERATION) + 1;
-
-			player->flipped = input->left;
 
 		} else {
 			speed_fac *= 1 - DECELERATION;
 		}
+
+		if (input->left ^ input->right)
+			player->flipped = input->left;
 
 	} else {
 
@@ -164,6 +165,7 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 		collided_horizontally = TRUE;
 
 		if (ABS(player->dx) < 0.1) {
+			
 			speed_fac = 0;
 			player->dx = 0;
 		}
@@ -177,9 +179,11 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 
 		if (ABS(player->dy) < 0.1) {
 
-			player->dy = player->dy < 0 ? 1 : 0;
+			time_of_last_jump = -100000;
+			player->dy = 0;
 		}
 	}
+
 	player->y += player->dy;
 
 	/*
