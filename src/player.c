@@ -4,17 +4,16 @@
 #include "window.h"
 
 #define MAX_RUN_SPEED 3.0
-#define SLIPPERINESS 0.9
+#define ACCELERATION 0.04
 #define JUMP_SPEED -5
 
 #define STANDING_HEIGHT 28
 #define CROUCHING_HEIGHT 15
 
-#define DEFAULT_GRAVITY 0.35
+#define DEFAULT_GRAVITY 0.32
 #define HOLD_JUMP_GRAVITY 0.17
 
-#define ACCELERATION 0.03
-#define DECELERATION 0.1
+#define SPEED_FAC_DELTA 0.03
 
 #define ABS(x) ((x) > 0 ? (x) : -(x))
 
@@ -25,6 +24,8 @@ static unsigned long time_of_last_grounded;
 static float run_cycle_timer;
 
 static float speed_fac; // 0..1
+
+#define RUN_SPEED (!(input->left ^ input->right) ? 0 : speed_fac < 0.8 ? 0.8 * MAX_RUN_SPEED : MAX_RUN_SPEED)
 
 static inline int point_collides(SpriteMap *level, int x, int y) {
 
@@ -81,6 +82,10 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 		time_of_last_grounded = time;
 	}
 
+	// flipped
+	if (input->left ^ input->right)
+		player->flipped = input->left;
+
 	/*
 	 * update player velocity
 	 */
@@ -93,30 +98,26 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 		time_of_last_grounded = 0;
 	}
 
-	// gravity (if recently jumped, make gravity lesser if holding jump, otherwise greater)
-	// ("recently jumped" is longer the faster you're running)
-	// TODO stop hardcoding these values
+	// gravity
 	player->dy += input->up ? HOLD_JUMP_GRAVITY : DEFAULT_GRAVITY;
 
+	// update speed fac based on input
 	if (player->crouched) {
 
 		// crouch jumping
 		if (time_of_last_grounded != time) {
 
 			if (input->left ^ input->right)
-				speed_fac = (speed_fac - 1) * (1 - ACCELERATION) + 1;
+				speed_fac = (speed_fac - 1) * (1 - SPEED_FAC_DELTA) + 1;
 
 		} else {
-			speed_fac *= 1 - DECELERATION;
+			speed_fac *= 1 - SPEED_FAC_DELTA;
 		}
-
-		if (input->left ^ input->right)
-			player->flipped = input->left;
 
 	} else {
 
 		// running animation
-		run_cycle_timer += (speed_fac + 1) / 15;
+		run_cycle_timer += (speed_fac + 1) / 13;
 	
 		if (run_cycle_timer >= 4.0) {
 			run_cycle_timer -= 4.0;
@@ -125,11 +126,10 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 		// running
 		if (input->left ^ input->right) {
 
-			speed_fac = (speed_fac - 1) * (1 - ACCELERATION) + 1;
-			player->flipped = input->left;
+			speed_fac = (speed_fac - 1) * (1 - SPEED_FAC_DELTA) + 1;
 
 		} else {
-			speed_fac *= 1 - DECELERATION;
+			speed_fac *= 1 - SPEED_FAC_DELTA;
 		}
 	}
 
@@ -141,7 +141,7 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 		speed_fac = 0;
 
 	// update velocity
-	player->dx = player->dx * SLIPPERINESS + (player->flipped ? -1 : 1) * speed_fac * MAX_RUN_SPEED * (1 - SLIPPERINESS);
+	player->dx = player->dx * (1.0 - ACCELERATION) + (player->flipped ? -1 : 1) * RUN_SPEED * ACCELERATION;
 
 	/*
 	 * apply player velocity
