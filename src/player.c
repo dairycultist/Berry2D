@@ -10,8 +10,8 @@
 #define STANDING_HEIGHT 28
 #define CROUCHING_HEIGHT 15
 
-#define DEFAULT_GRAVITY 0.32
-#define HOLD_JUMP_GRAVITY 0.17
+#define DEFAULT_GRAVITY 0.33
+#define HOLD_JUMP_GRAVITY 0.16
 
 #define SPEED_FAC_DELTA 0.03
 
@@ -105,10 +105,9 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 	if (player->crouched) {
 
 		// crouch jumping
-		if (time_of_last_grounded != time) {
+		if (time_of_last_grounded != time && input->left ^ input->right) {
 
-			if (input->left ^ input->right)
-				speed_fac = (speed_fac - 1) * (1 - SPEED_FAC_DELTA) + 1;
+			speed_fac = (speed_fac - 1) * (1 - SPEED_FAC_DELTA) + 1;
 
 		} else {
 			speed_fac *= 1 - SPEED_FAC_DELTA;
@@ -141,7 +140,7 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 		speed_fac = 0;
 
 	// update velocity
-	player->dx = player->dx * (1.0 - ACCELERATION) + (player->flipped ? -1 : 1) * RUN_SPEED * ACCELERATION;
+	player->dx = player->dx * (1.0 - ACCELERATION) + (player->flipped ? -1 : 1) * (player->crouched && time_of_last_grounded == time ? 0.0 : RUN_SPEED) * ACCELERATION;
 
 	/*
 	 * apply player velocity
