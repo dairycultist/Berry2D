@@ -3,19 +3,18 @@
 
 #include "window.h"
 
-#define MAX_RUN_SPEED 2.5
-#define SLIPPERINESS 0.95
-#define JUMP_SPEED -3.3
+#define MAX_RUN_SPEED 3.0
+#define SLIPPERINESS 0.9
+#define JUMP_SPEED -5
 
 #define STANDING_HEIGHT 28
 #define CROUCHING_HEIGHT 15
 
-#define DEFAULT_GRAVITY 0.15
-#define LOW_JUMP_GRAVITY 0.35
-#define HIGH_JUMP_GRAVITY 0.04
+#define DEFAULT_GRAVITY 0.35
+#define HOLD_JUMP_GRAVITY 0.17
 
-#define ACCELERATION 0.035
-#define DECELERATION 0.09
+#define ACCELERATION 0.03
+#define DECELERATION 0.1
 
 #define ABS(x) ((x) > 0 ? (x) : -(x))
 
@@ -97,14 +96,7 @@ void process_player(unsigned long time, Input *input, Player *player, SpriteMap 
 	// gravity (if recently jumped, make gravity lesser if holding jump, otherwise greater)
 	// ("recently jumped" is longer the faster you're running)
 	// TODO stop hardcoding these values
-	if ((time - time_of_last_jump) < 6 + speed_fac * 10) {
-
-		player->dy += input->up ? HIGH_JUMP_GRAVITY : LOW_JUMP_GRAVITY;
-
-	} else {
-
-		player->dy += DEFAULT_GRAVITY;
-	}
+	player->dy += input->up ? HOLD_JUMP_GRAVITY : DEFAULT_GRAVITY;
 
 	if (player->crouched) {
 
