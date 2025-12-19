@@ -25,7 +25,7 @@ static float run_cycle_timer;
 
 static float speed_fac; // 0..1
 
-#define RUN_SPEED (!(input->left ^ input->right) ? 0 : speed_fac < 0.8 ? 0.8 * MAX_RUN_SPEED : MAX_RUN_SPEED)
+#define RUN_SPEED (!(input->left ^ input->right) ? 0 : speed_fac < 0.8 ? 0.65 * MAX_RUN_SPEED : MAX_RUN_SPEED)
 
 static inline int point_collides(SpriteMap *level, int x, int y) {
 
